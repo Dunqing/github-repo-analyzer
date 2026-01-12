@@ -1,112 +1,53 @@
-:root {
-  /* 2026 Color Palette */
+@import "tailwindcss";
+
+/* 2026 Color Palette Theme */
+@theme {
   /* Cloud Dancer - Pantone 2026 Color of the Year */
-  --cloud-dancer: #F4F4F2;
-  --cloud-dancer-dim: #E8E8E6;
+  --color-cloud: #F4F4F2;
+  --color-cloud-dim: #E8E8E6;
 
   /* Mocha Mousse - Sophisticated earthy tone */
-  --mocha-mousse: #A47864;
-  --mocha-light: #C49A88;
-  --mocha-dark: #7D5A4A;
+  --color-mocha: #A47864;
+  --color-mocha-light: #C49A88;
+  --color-mocha-dark: #7D5A4A;
 
   /* Digital Lavender - Tech-forward sophistication */
-  --digital-lavender: #E6E6FA;
-  --lavender-muted: #B4A7D6;
-  --lavender-deep: #7C6FAB;
+  --color-lavender: #E6E6FA;
+  --color-lavender-muted: #B4A7D6;
+  --color-lavender-deep: #7C6FAB;
 
   /* Neo-Mint - Futuristic optimism */
-  --neo-mint: #AAFAC8;
-  --neo-mint-muted: #8DD9A8;
+  --color-mint: #AAFAC8;
+  --color-mint-muted: #8DD9A8;
 
   /* Deep Teal - Confident accent */
-  --deep-teal: #1D5C63;
-  --teal-light: #2A8A94;
+  --color-teal: #1D5C63;
+  --color-teal-light: #2A8A94;
 
-  /* Neutrals */
-  --neutral-50: #FAFAFA;
-  --neutral-100: #F5F5F5;
-  --neutral-200: #E5E5E5;
-  --neutral-300: #D4D4D4;
-  --neutral-400: #A3A3A3;
-  --neutral-500: #737373;
-  --neutral-600: #525252;
-  --neutral-700: #404040;
-  --neutral-800: #262626;
-  --neutral-900: #171717;
-
-  /* Semantic colors */
-  --bg-primary: var(--cloud-dancer);
-  --bg-secondary: #FFFFFF;
-  --bg-tertiary: var(--neutral-100);
-  --text-primary: var(--neutral-900);
-  --text-secondary: var(--neutral-600);
-  --text-muted: var(--neutral-400);
-  --accent-primary: var(--mocha-mousse);
-  --accent-secondary: var(--lavender-deep);
-  --border-color: var(--neutral-200);
-
-  /* Typography */
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  font-weight: 400;
-
-  color-scheme: light;
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Font families */
+  --font-mono: 'SF Mono', 'Fira Code', 'Menlo', monospace;
 }
 
-/* Dark mode - Cinematic & intentional */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #0F0F0F;
-    --bg-secondary: #1A1A1A;
-    --bg-tertiary: #242424;
-    --text-primary: var(--cloud-dancer);
-    --text-secondary: var(--neutral-400);
-    --text-muted: var(--neutral-500);
-    --accent-primary: var(--mocha-light);
-    --accent-secondary: var(--lavender-muted);
-    --border-color: var(--neutral-800);
-
-    color-scheme: dark;
-  }
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  background: var(--bg-primary);
-  transition: background-color 0.3s ease;
-}
-
-#root {
-  min-height: 100vh;
-}
-
-/* Smooth scrolling */
+/* Base styles */
 html {
   scroll-behavior: smooth;
 }
 
-/* Selection styling */
-::selection {
-  background: var(--lavender-muted);
-  color: var(--neutral-900);
+body {
+  @apply bg-cloud text-neutral-900 antialiased;
 }
 
-/* Focus visible for accessibility */
-:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
+::selection {
+  @apply bg-lavender-muted text-neutral-900;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-neutral-950 text-cloud;
+  }
+
+  ::selection {
+    @apply bg-lavender-deep text-white;
+  }
 }
