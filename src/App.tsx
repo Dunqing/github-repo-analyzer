@@ -1,9 +1,14 @@
-import { useState, useCallback } from 'react';
-import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType, HardDrive } from 'lucide-react';
 import { useRepoAnalyzer } from '@/hooks/useRepoAnalyzer';
-import { FileTree } from '@/components/FileTree';
+import { FileTree, countMatchingFiles } from '@/components/FileTree';
 import { FileStats } from '@/components/FileStats';
+import { FileSizeStats } from '@/components/FileSizeStats';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { BranchSelector } from '@/components/BranchSelector';
+import { FileTreeSearch } from '@/components/FileTreeSearch';
+import { CopyTreeButton } from '@/components/CopyTreeButton';
+import { ShareButton } from '@/components/ShareButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,10 +19,47 @@ import '@/index.css';
 
 function App() {
   const [repoUrl, setRepoUrl] = useState('');
-  const { analyze, isAnalyzing, progress, result, error } = useRepoAnalyzer();
+  const [treeFilter, setTreeFilter] = useState('');
+  const {
+    analyze,
+    analyzeWithRef,
+    isAnalyzing,
+    progress,
+    result,
+    error,
+    branches,
+    tags,
+    selectedRef,
+    defaultBranch,
+  } = useRepoAnalyzer();
+
+  // Handle URL parameters on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const repoParam = params.get('repo');
+    const branchParam = params.get('branch');
+
+    if (repoParam) {
+      setRepoUrl(repoParam);
+      analyze(repoParam, branchParam || undefined);
+    }
+  }, [analyze]);
+
+  // Update URL when analysis completes
+  useEffect(() => {
+    if (result?.repoName) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('repo', result.repoName);
+      if (result.ref) {
+        url.searchParams.set('branch', result.ref);
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [result]);
 
   const handleAnalyze = useCallback(async () => {
     if (!repoUrl.trim()) return;
+    setTreeFilter('');
     await analyze(repoUrl);
   }, [analyze, repoUrl]);
 
@@ -26,6 +68,13 @@ function App() {
       handleAnalyze();
     }
   };
+
+  const handleBranchChange = useCallback((ref: string) => {
+    setTreeFilter('');
+    analyzeWithRef(ref);
+  }, [analyzeWithRef]);
+
+  const matchingCount = result ? countMatchingFiles(result.tree, treeFilter) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -111,10 +160,28 @@ function App() {
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <FolderTree className="h-5 w-5" />
                     {result.tree.name}
+                    {result.ref && (
+                      <Badge variant="outline" className="ml-2 font-mono text-xs">
+                        {result.ref}
+                      </Badge>
+                    )}
                   </CardTitle>
                   <CardDescription>
                     Repository analysis complete
                   </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BranchSelector
+                    branches={branches}
+                    tags={tags}
+                    selectedRef={selectedRef}
+                    defaultBranch={defaultBranch}
+                    onSelect={handleBranchChange}
+                    disabled={isAnalyzing}
+                  />
+                  {result.repoName && (
+                    <ShareButton repoName={result.repoName} branch={result.ref} />
+                  )}
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
@@ -144,12 +211,32 @@ function App() {
                     <BarChart3 className="h-4 w-4" />
                     Stats
                   </TabsTrigger>
+                  <TabsTrigger value="size" className="gap-2">
+                    <HardDrive className="h-4 w-4" />
+                    Size
+                  </TabsTrigger>
                 </TabsList>
-                <TabsContent value="tree" className="max-h-[500px] overflow-y-auto -mx-2 px-2">
-                  <FileTree node={result.tree} />
+                <TabsContent value="tree">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex-1 mr-4">
+                      <FileTreeSearch
+                        value={treeFilter}
+                        onChange={setTreeFilter}
+                        matchCount={matchingCount}
+                        totalCount={result.stats.totalFiles}
+                      />
+                    </div>
+                    <CopyTreeButton tree={result.tree} />
+                  </div>
+                  <div className="max-h-[500px] overflow-y-auto -mx-2 px-2">
+                    <FileTree node={result.tree} filter={treeFilter} />
+                  </div>
                 </TabsContent>
                 <TabsContent value="stats">
                   <FileStats stats={result.stats} />
+                </TabsContent>
+                <TabsContent value="size">
+                  <FileSizeStats stats={result.stats} tree={result.tree} />
                 </TabsContent>
               </Tabs>
             </CardContent>
