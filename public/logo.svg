@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="tealGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D9488"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="lavenderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main folder shape -->
+  <path d="M8 16C8 13.7909 9.79086 12 12 12H24L28 16H52C54.2091 16 56 17.7909 56 20V48C56 50.2091 54.2091 52 52 52H12C9.79086 52 8 50.2091 8 48V16Z" fill="url(#tealGradient)"/>
+
+  <!-- Folder tab highlight -->
+  <path d="M8 16C8 13.7909 9.79086 12 12 12H24L28 16H8V16Z" fill="#14B8A6" opacity="0.8"/>
+
+  <!-- File tree lines -->
+  <g stroke="#ffffff" stroke-width="2" stroke-linecap="round">
+    <!-- Root node -->
+    <circle cx="18" cy="28" r="2.5" fill="#ffffff"/>
+    <!-- Vertical line from root -->
+    <line x1="18" y1="31" x2="18" y2="44"/>
+    <!-- Branch 1 -->
+    <line x1="18" y1="34" x2="26" y2="34"/>
+    <circle cx="28" cy="34" r="2" fill="#ffffff"/>
+    <!-- Branch 2 -->
+    <line x1="18" y1="40" x2="26" y2="40"/>
+    <circle cx="28" cy="40" r="2" fill="#ffffff"/>
+    <!-- Branch 3 -->
+    <line x1="18" y1="46" x2="26" y2="46"/>
+    <circle cx="28" cy="46" r="2" fill="#ffffff"/>
+  </g>
+
+  <!-- Magnifying glass -->
+  <g transform="translate(32, 28)">
+    <circle cx="10" cy="10" r="9" stroke="url(#lavenderGradient)" stroke-width="3" fill="none"/>
+    <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="url(#lavenderGradient)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Analysis bars inside magnifier -->
+    <rect x="5" y="8" width="3" height="7" rx="1" fill="#A78BFA"/>
+    <rect x="9" y="5" width="3" height="10" rx="1" fill="#8B5CF6"/>
+    <rect x="13" y="10" width="3" height="5" rx="1" fill="#A78BFA"/>
+  </g>
+</svg>

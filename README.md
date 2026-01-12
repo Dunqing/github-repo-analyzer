@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/logo.svg" alt="GitHub Repo Analyzer Logo" width="128" height="128">
+</p>
+
 # GitHub Repo Analyzer
 
 A web tool to analyze the file structure and statistics of any public GitHub repository. Built with modern web technologies and a clean 2026 design aesthetic.
