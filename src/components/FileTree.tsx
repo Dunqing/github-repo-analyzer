@@ -21,18 +21,17 @@ export function FileTree({ node, level = 0 }: FileTreeProps) {
     return (
       <div
         className={cn(
-          "flex items-center gap-2 py-1.5 px-2 rounded-md text-sm",
-          "hover:bg-accent transition-colors",
-          "text-muted-foreground hover:text-foreground"
+          "flex items-center gap-2 py-1 px-2 rounded text-sm",
+          "hover:bg-muted/50 transition-colors cursor-default"
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         <FileIcon
           filename={node.name}
           extension={node.extension}
-          className="h-4 w-4 shrink-0"
+          className="h-4 w-4 shrink-0 text-muted-foreground"
         />
-        <span className="truncate font-mono text-foreground">{node.name}</span>
+        <span className="truncate font-mono text-xs">{node.name}</span>
       </div>
     );
   }
@@ -42,8 +41,8 @@ export function FileTree({ node, level = 0 }: FileTreeProps) {
       <CollapsibleTrigger asChild>
         <button
           className={cn(
-            "flex items-center gap-2 py-1.5 px-2 rounded-md text-sm w-full",
-            "hover:bg-accent transition-colors text-left"
+            "flex items-center gap-2 py-1 px-2 rounded text-sm w-full",
+            "hover:bg-muted/50 transition-colors text-left"
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
         >
@@ -58,15 +57,15 @@ export function FileTree({ node, level = 0 }: FileTreeProps) {
             isOpen={isOpen}
             className="h-4 w-4 shrink-0"
           />
-          <span className="truncate font-medium font-mono">{node.name}</span>
-          <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full shrink-0">
-            {node.fileCount} files
-            {node.directoryCount ? `, ${node.directoryCount} folders` : ''}
+          <span className="truncate font-medium font-mono text-xs">{node.name}</span>
+          <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
+            {node.fileCount}
+            {node.directoryCount ? ` / ${node.directoryCount}` : ''}
           </span>
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="border-l border-border ml-4 pl-2">
+        <div className="border-l border-border ml-[22px]">
           {node.children?.map((child) => (
             <FileTree key={child.path} node={child} level={level + 1} />
           ))}
