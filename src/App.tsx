@@ -3,6 +3,7 @@ import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType 
 import { useRepoAnalyzer } from '@/hooks/useRepoAnalyzer';
 import { FileTree } from '@/components/FileTree';
 import { FileStats } from '@/components/FileStats';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +29,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Theme Toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       <div className="container max-w-4xl mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-12">
