@@ -1,4 +1,5 @@
 import type { FileStats as FileStatsType } from '../types';
+import { getIconForExtension, IconDefault } from './FileIcon';
 
 interface FileStatsProps {
   stats: FileStatsType;
@@ -33,22 +34,26 @@ export function FileStats({ stats }: FileStatsProps) {
         File Types Distribution
       </h3>
       <div className="flex flex-col gap-3.5">
-        {sortedExtensions.map(([ext, count]) => (
-          <div key={ext} className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-sm">
-              <span className="text-neutral-900 dark:text-cloud font-mono font-medium">
-                {ext === 'no-ext' ? '(no extension)' : `.${ext}`}
-              </span>
-              <span className="text-neutral-400 dark:text-neutral-500">{count}</span>
+        {sortedExtensions.map(([ext, count]) => {
+          const Icon = ext === 'no-ext' ? IconDefault : getIconForExtension(ext);
+          return (
+            <div key={ext} className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2 text-neutral-900 dark:text-cloud font-mono font-medium">
+                  <Icon className="w-5 h-5 shrink-0" />
+                  {ext === 'no-ext' ? '(no extension)' : `.${ext}`}
+                </span>
+                <span className="text-neutral-400 dark:text-neutral-500">{count}</span>
+              </div>
+              <div className="h-2 bg-neutral-100 dark:bg-neutral-800 rounded overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-mocha to-lavender-deep rounded transition-all duration-500 ease-out"
+                  style={{ width: `${(count / maxCount) * 100}%` }}
+                />
+              </div>
             </div>
-            <div className="h-2 bg-neutral-100 dark:bg-neutral-800 rounded overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-mocha to-lavender-deep rounded transition-all duration-500 ease-out"
-                style={{ width: `${(count / maxCount) * 100}%` }}
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

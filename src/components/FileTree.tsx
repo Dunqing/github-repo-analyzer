@@ -1,36 +1,10 @@
 import { useState } from 'react';
 import type { FileNode } from '../types';
+import { FileIcon } from './FileIcon';
 
 interface FileTreeProps {
   node: FileNode;
   level?: number;
-}
-
-const FILE_ICONS: Record<string, string> = {
-  ts: '📘',
-  tsx: '📘',
-  js: '📒',
-  jsx: '📒',
-  json: '📋',
-  md: '📝',
-  css: '🎨',
-  scss: '🎨',
-  html: '🌐',
-  svg: '🖼️',
-  png: '🖼️',
-  jpg: '🖼️',
-  gif: '🖼️',
-  yml: '⚙️',
-  yaml: '⚙️',
-  toml: '⚙️',
-  lock: '🔒',
-  gitignore: '🙈',
-  env: '🔐',
-  'no-ext': '📄',
-};
-
-function getFileIcon(extension?: string): string {
-  return FILE_ICONS[extension || 'no-ext'] || '📄';
 }
 
 export function FileTree({ node, level = 0 }: FileTreeProps) {
@@ -43,11 +17,12 @@ export function FileTree({ node, level = 0 }: FileTreeProps) {
         className="flex items-center gap-2.5 py-2 px-3 my-0.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors font-mono text-sm"
         style={{ paddingLeft: `${paddingLeft}px` }}
       >
-        <span className="text-base opacity-80">{getFileIcon(node.extension)}</span>
+        <FileIcon
+          filename={node.name}
+          extension={node.extension}
+          className="w-5 h-5 shrink-0"
+        />
         <span className="text-neutral-900 dark:text-cloud">{node.name}</span>
-        {node.extension && (
-          <span className="text-neutral-400 dark:text-neutral-500 text-xs">.{node.extension}</span>
-        )}
       </div>
     );
   }
@@ -62,7 +37,11 @@ export function FileTree({ node, level = 0 }: FileTreeProps) {
         <span className={`text-[10px] text-neutral-400 w-3.5 transition-transform ${isExpanded ? '' : '-rotate-90'}`}>
           ▼
         </span>
-        <span className="text-base">📁</span>
+        <FileIcon
+          isFolder
+          isOpen={isExpanded}
+          className="w-5 h-5 shrink-0"
+        />
         <span className="text-neutral-900 dark:text-cloud font-medium">{node.name}</span>
         <span className="ml-auto text-xs text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
           {node.fileCount} files
