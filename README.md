@@ -1,73 +1,87 @@
-# React + TypeScript + Vite
+# GitHub Repo Analyzer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web tool to analyze the file structure and statistics of any public GitHub repository. Built with modern web technologies and a clean 2026 design aesthetic.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Input Formats
+- Short format: `owner/repo` (e.g., `facebook/react`)
+- Full URL: `https://github.com/owner/repo`
 
-## React Compiler
+### File Tree View
+- Interactive expandable/collapsible directory tree
+- VS Code file icons for 40+ file types
+- Folder icons with open/closed states
+- File and folder count displayed per directory
+- Auto-expands first 2 levels by default
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Statistics View
+- Total files count
+- Total directories count
+- Number of unique file types
+- File type distribution with visual bar chart
+- VS Code icons for each file type
 
-## Expanding the ESLint configuration
+### Smart Filtering
+Automatically ignores common non-essential directories:
+- `.git`, `node_modules`, `.next`, `dist`, `build`, `.cache`, `__pycache__`, `.venv`, `venv`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Modern UI/UX
+- **2026 Color Palette**: Cloud Dancer, Mocha Mousse, Digital Lavender, Deep Teal
+- **Dark Mode**: Automatically detects system preference
+- **Responsive Design**: Works on desktop and mobile
+- Loading states with progress indicators
+- Friendly error messages
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Vite 8** (beta) - Next-generation frontend tooling
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Tailwind CSS v4** - Utility-first styling
+- **unplugin-icons** - VS Code icons via Iconify
+- **GitHub REST API** - Repository data fetching
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- pnpm (recommended) or npm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/user/github-repo-analyzer.git
+cd github-repo-analyzer
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Build for Production
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm build
+pnpm preview
 ```
+
+## Usage
+
+1. Open the app in your browser
+2. Enter a GitHub repository in one of these formats:
+   - `facebook/react`
+   - `https://github.com/facebook/react`
+3. Click "Analyze" or press Enter
+4. Explore the file tree and statistics
+
+## Roadmap
+
+See [ROADMAP.md](./ROADMAP.md) for planned features.
+
+## License
+
+MIT
