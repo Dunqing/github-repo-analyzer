@@ -37,7 +37,7 @@ function App() {
       <div className="flex flex-col sm:flex-row gap-4 mb-10 p-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm">
         <input
           type="text"
-          placeholder="Enter GitHub repo URL (e.g., https://github.com/facebook/react)"
+          placeholder="Enter repo (e.g., facebook/react or https://github.com/facebook/react)"
           value={repoUrl}
           onChange={(e) => setRepoUrl(e.target.value)}
           onKeyDown={handleKeyDown}

@@ -157,14 +157,25 @@ export function useRepoAnalyzer() {
     setResult(null);
 
     try {
-      // Parse GitHub URL
-      const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
-      if (!match) {
-        throw new Error('Invalid GitHub URL. Please use format: https://github.com/owner/repo');
-      }
+      // Parse GitHub URL or owner/repo format
+      const input = repoUrl.trim();
+      let owner: string;
+      let repoName: string;
 
-      const [, owner, repo] = match;
-      const repoName = repo.replace(/\.git$/, '').replace(/\/$/, '');
+      // Try full URL format first: https://github.com/owner/repo
+      const urlMatch = input.match(/github\.com\/([^/]+)\/([^/]+)/);
+      // Try short format: owner/repo
+      const shortMatch = input.match(/^([^/]+)\/([^/]+)$/);
+
+      if (urlMatch) {
+        owner = urlMatch[1];
+        repoName = urlMatch[2].replace(/\.git$/, '').replace(/\/$/, '');
+      } else if (shortMatch) {
+        owner = shortMatch[1];
+        repoName = shortMatch[2].replace(/\.git$/, '').replace(/\/$/, '');
+      } else {
+        throw new Error('Invalid format. Use owner/repo or https://github.com/owner/repo');
+      }
 
       setProgress('Fetching repository info...');
 
