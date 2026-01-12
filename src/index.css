@@ -1,31 +1,73 @@
 @import "tailwindcss";
 
-/* 2026 Color Palette Theme */
 @theme {
-  /* Cloud Dancer - Pantone 2026 Color of the Year */
+  /* 2026 Color Palette */
   --color-cloud: #F4F4F2;
   --color-cloud-dim: #E8E8E6;
-
-  /* Mocha Mousse - Sophisticated earthy tone */
   --color-mocha: #A47864;
   --color-mocha-light: #C49A88;
   --color-mocha-dark: #7D5A4A;
-
-  /* Digital Lavender - Tech-forward sophistication */
   --color-lavender: #E6E6FA;
   --color-lavender-muted: #B4A7D6;
   --color-lavender-deep: #7C6FAB;
-
-  /* Neo-Mint - Futuristic optimism */
   --color-mint: #AAFAC8;
   --color-mint-muted: #8DD9A8;
-
-  /* Deep Teal - Confident accent */
   --color-teal: #1D5C63;
   --color-teal-light: #2A8A94;
 
-  /* Font families */
+  /* shadcn/ui semantic colors - Light */
+  --color-background: var(--color-cloud);
+  --color-foreground: #171717;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #171717;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #171717;
+  --color-primary: var(--color-mocha);
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #F5F5F5;
+  --color-secondary-foreground: #171717;
+  --color-muted: #F5F5F5;
+  --color-muted-foreground: #737373;
+  --color-accent: #F5F5F5;
+  --color-accent-foreground: #171717;
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #E5E5E5;
+  --color-input: #E5E5E5;
+  --color-ring: var(--color-mocha);
+
+  /* Border radius */
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.25rem;
+
+  /* Font */
   --font-mono: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-background: #0A0A0A;
+    --color-foreground: var(--color-cloud);
+    --color-card: #171717;
+    --color-card-foreground: var(--color-cloud);
+    --color-popover: #171717;
+    --color-popover-foreground: var(--color-cloud);
+    --color-primary: var(--color-mocha-light);
+    --color-primary-foreground: #171717;
+    --color-secondary: #262626;
+    --color-secondary-foreground: var(--color-cloud);
+    --color-muted: #262626;
+    --color-muted-foreground: #A3A3A3;
+    --color-accent: #262626;
+    --color-accent-foreground: var(--color-cloud);
+    --color-destructive: #7F1D1D;
+    --color-destructive-foreground: var(--color-cloud);
+    --color-border: #262626;
+    --color-input: #262626;
+    --color-ring: var(--color-mocha-light);
+  }
 }
 
 /* Base styles */
@@ -34,19 +76,14 @@ html {
 }
 
 body {
-  @apply bg-cloud text-neutral-900 antialiased;
+  @apply bg-background text-foreground antialiased;
 }
 
 ::selection {
-  @apply bg-lavender-muted text-neutral-900;
+  @apply bg-lavender-muted text-foreground;
 }
 
-/* Dark mode */
 @media (prefers-color-scheme: dark) {
-  body {
-    @apply bg-neutral-950 text-cloud;
-  }
-
   ::selection {
     @apply bg-lavender-deep text-white;
   }

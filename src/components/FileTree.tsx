@@ -1,6 +1,13 @@
 import { useState } from 'react';
-import type { FileNode } from '../types';
-import { FileIcon } from './FileIcon';
+import { ChevronRight } from 'lucide-react';
+import type { FileNode } from '@/types';
+import { FileIcon } from '@/components/FileIcon';
+import { cn } from '@/lib/utils';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 interface FileTreeProps {
   node: FileNode;
@@ -8,53 +15,63 @@ interface FileTreeProps {
 }
 
 export function FileTree({ node, level = 0 }: FileTreeProps) {
-  const [isExpanded, setIsExpanded] = useState(level < 2);
-  const paddingLeft = level * 16 + 8;
+  const [isOpen, setIsOpen] = useState(level < 2);
 
   if (node.type === 'file') {
     return (
       <div
-        className="flex items-center gap-2.5 py-2 px-3 my-0.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors font-mono text-sm"
-        style={{ paddingLeft: `${paddingLeft}px` }}
+        className={cn(
+          "flex items-center gap-2 py-1.5 px-2 rounded-md text-sm",
+          "hover:bg-accent transition-colors",
+          "text-muted-foreground hover:text-foreground"
+        )}
+        style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         <FileIcon
           filename={node.name}
           extension={node.extension}
-          className="w-5 h-5 shrink-0"
+          className="h-4 w-4 shrink-0"
         />
-        <span className="text-neutral-900 dark:text-cloud">{node.name}</span>
+        <span className="truncate font-mono text-foreground">{node.name}</span>
       </div>
     );
   }
 
   return (
-    <div>
-      <div
-        className="flex items-center gap-2.5 py-2 px-3 my-0.5 cursor-pointer rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors font-mono text-sm"
-        style={{ paddingLeft: `${paddingLeft}px` }}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <span className={`text-[10px] text-neutral-400 w-3.5 transition-transform ${isExpanded ? '' : '-rotate-90'}`}>
-          ▼
-        </span>
-        <FileIcon
-          isFolder
-          isOpen={isExpanded}
-          className="w-5 h-5 shrink-0"
-        />
-        <span className="text-neutral-900 dark:text-cloud font-medium">{node.name}</span>
-        <span className="ml-auto text-xs text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
-          {node.fileCount} files
-          {node.directoryCount ? `, ${node.directoryCount} folders` : ''}
-        </span>
-      </div>
-      {isExpanded && node.children && (
-        <div className="ml-4 pl-4 border-l border-neutral-200 dark:border-neutral-700">
-          {node.children.map((child) => (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <button
+          className={cn(
+            "flex items-center gap-2 py-1.5 px-2 rounded-md text-sm w-full",
+            "hover:bg-accent transition-colors text-left"
+          )}
+          style={{ paddingLeft: `${level * 16 + 8}px` }}
+        >
+          <ChevronRight
+            className={cn(
+              "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+              isOpen && "rotate-90"
+            )}
+          />
+          <FileIcon
+            isFolder
+            isOpen={isOpen}
+            className="h-4 w-4 shrink-0"
+          />
+          <span className="truncate font-medium font-mono">{node.name}</span>
+          <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full shrink-0">
+            {node.fileCount} files
+            {node.directoryCount ? `, ${node.directoryCount} folders` : ''}
+          </span>
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="border-l border-border ml-4 pl-2">
+          {node.children?.map((child) => (
             <FileTree key={child.path} node={child} level={level + 1} />
           ))}
         </div>
-      )}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
