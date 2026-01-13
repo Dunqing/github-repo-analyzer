@@ -2,6 +2,7 @@ import { File, Folder, FileType } from 'lucide-react';
 import type { FileStats as FileStatsType } from '@/types';
 import { getIconForExtension, IconDefault } from '@/components/FileIcon';
 import { Progress } from '@/components/ui/progress';
+import { FileTypeChart } from '@/components/FileTypeChart';
 
 interface FileStatsProps {
   stats: FileStatsType;
@@ -34,6 +35,9 @@ export function FileStats({ stats }: FileStatsProps) {
           <p className="text-xs text-muted-foreground">File Types</p>
         </div>
       </div>
+
+      {/* File Type Distribution Chart */}
+      <FileTypeChart stats={stats} />
 
       {/* File Types Distribution */}
       <div>

@@ -329,6 +329,9 @@ Better handling of repositories with truncated trees.
 - [x] 1.4 File Size Statistics
 - [x] 1.5 Copy Tree as Text
 
+### Phase 2: Visualizations
+- [x] 2.1 Pie/Donut Chart
+
 ### Foundation
 - [x] Basic repo analysis (file tree, stats)
 - [x] VS Code file icons
