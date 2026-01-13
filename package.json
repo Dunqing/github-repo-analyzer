@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "pnpm lint && vite build",
     "lint": "oxlint src --tsconfig tsconfig.json --type-aware --type-check",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
@@ -43,7 +43,6 @@
     "oxlint": "^1.39.0",
     "oxlint-tsgolint": "^0.11.0",
     "tailwindcss": "^4.1.18",
-    "typescript": "~5.9.3",
     "unplugin-icons": "^22.5.0",
     "vite": "8.0.0-beta.7"
   }
