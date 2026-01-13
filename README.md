@@ -4,62 +4,81 @@
 
 # GitHub Repo Analyzer
 
-A web tool to analyze the file structure and statistics of any public GitHub repository. Built with modern web technologies and a clean 2026 design aesthetic.
+A powerful web tool to analyze, visualize, and explore the file structure of any public GitHub repository. Get instant insights into repository composition, file sizes, dependencies, and more.
+
+<p align="center">
+  <img src="public/screenshot.png" alt="GitHub Repo Analyzer Screenshot" width="800">
+</p>
 
 ## Features
 
-### Input Formats
+### Repository Analysis
 
-- Short format: `owner/repo` (e.g., `facebook/react`)
-- Full URL: `https://github.com/owner/repo`
+- **Flexible Input** - Enter `owner/repo` or paste a full GitHub URL
+- **Branch & Tag Selection** - Analyze any branch or tag, not just the default
+- **Large Repo Support** - Navigate folder-by-folder for repositories with 100k+ files
+- **Smart Caching** - Results are cached locally to reduce API calls and speed up repeat visits
 
-### File Tree View
+### Interactive File Tree
 
-- Interactive expandable/collapsible directory tree
-- VS Code file icons for 40+ file types
-- Folder icons with open/closed states
-- File and folder count displayed per directory
-- Auto-expands first 2 levels by default
+- **Expandable Directory Tree** - Click to expand/collapse folders
+- **VS Code File Icons** - Beautiful icons for 40+ file types
+- **Search & Filter** - Find files instantly with real-time filtering
+- **Copy as Text** - Export the tree structure as ASCII art for documentation
+- **Folder Navigation** - Drill into subdirectories for large repositories
 
-### Statistics View
+### Statistics & Insights
 
-- Total files count
-- Total directories count
-- Number of unique file types
-- File type distribution with visual bar chart
-- VS Code icons for each file type
+- **File & Folder Counts** - Total files, directories, and unique file types
+- **File Type Distribution** - Visual bar chart showing composition by extension
+- **Size Analysis** - Total size, average file size, and top 10 largest files
+- **Lines of Code Estimate** - Rough LOC breakdown by language
+- **Donut Chart** - Interactive visualization of file type percentages
 
-### Smart Filtering
+### Dependency Detection
 
-Automatically ignores common non-essential directories:
+Automatically detects and displays project dependencies from:
 
-- `.git`, `node_modules`, `.next`, `dist`, `build`, `.cache`, `__pycache__`, `.venv`, `venv`
+- `package.json` (Node.js/npm)
+- `requirements.txt` (Python)
+- `Cargo.toml` (Rust)
+- `go.mod` (Go)
+- `Gemfile` (Ruby)
+- `pom.xml` / `build.gradle` (Java)
+- `pubspec.yaml` (Dart/Flutter)
 
-### Modern UI/UX
+### Branch Comparison
 
-- **2026 Color Palette**: Cloud Dancer, Mocha Mousse, Digital Lavender, Deep Teal
-- **Dark Mode**: Automatically detects system preference
-- **Responsive Design**: Works on desktop and mobile
-- Loading states with progress indicators
-- Friendly error messages
+Compare file structures between two branches:
+
+- See added, removed, and common files
+- Summary statistics for quick overview
+- Identify structural changes at a glance
+
+### Sharing & Export
+
+- **Shareable URLs** - Copy a link that auto-loads the repository
+- **Export as JSON** - Download complete analysis data
+- **Open in GitHub** - Quick link to view the repo on GitHub
+
+### User Experience
+
+- **Recent Repositories** - Quick access to your last 10 analyzed repos
+- **Keyboard Shortcuts** - Power user navigation (`/` to focus input, `Cmd+K` for search)
+- **Rate Limit Indicator** - See remaining GitHub API calls
+- **Dark/Light/System Theme** - Adapts to your preference
+- **Mobile Friendly** - Responsive design works on all devices
 
 ## Tech Stack
 
-- **Vite 8** (beta) - Next-generation frontend tooling
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Utility-first styling
-- **unplugin-icons** - VS Code icons via Iconify
-- **GitHub REST API** - Repository data fetching
+- **React 19** + **TypeScript**
+- **Vite 8**
+- **Tailwind CSS v4**
+- **shadcn/ui** components
+- **Recharts** for visualizations
+- **GitHub REST API**
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm (recommended) or npm
-
-### Installation
 
 ```bash
 # Clone the repository
@@ -73,25 +92,17 @@ pnpm install
 pnpm dev
 ```
 
-### Build for Production
-
-```bash
-pnpm build
-pnpm preview
-```
-
 ## Usage
 
-1. Open the app in your browser
-2. Enter a GitHub repository in one of these formats:
-   - `facebook/react`
-   - `https://github.com/facebook/react`
-3. Click "Analyze" or press Enter
-4. Explore the file tree and statistics
+1. Enter a GitHub repository (e.g., `oxc-project/oxc`)
+2. Click **Analyze** or press Enter
+3. Explore the file tree, statistics, and dependencies
+4. Switch branches, filter files, or export data as needed
 
-## Roadmap
+## API Rate Limits
 
-See [ROADMAP.md](./ROADMAP.md) for planned features.
+- **Unauthenticated**: 60 requests/hour
+- The rate limit indicator shows your remaining quota
 
 ## License
 
