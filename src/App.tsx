@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType, HardDrive, RefreshCw } from 'lucide-react';
+import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType, HardDrive, RefreshCw, KeyRound } from 'lucide-react';
 import { useRepoAnalyzer } from '@/hooks/useRepoAnalyzer';
 import { FileTree, countMatchingFiles } from '@/components/FileTree';
 import { FileStats } from '@/components/FileStats';
@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import '@/index.css';
 
 function App() {
@@ -32,7 +33,10 @@ function App() {
     selectedRef,
     defaultBranch,
     cacheInfo,
+    token,
+    setToken,
   } = useRepoAnalyzer();
+  const [showSettings, setShowSettings] = useState(false);
 
   // Handle URL parameters on mount
   useEffect(() => {
@@ -111,40 +115,71 @@ function App() {
             GitHub Repo Analyzer
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Analyze the file structure and statistics of any public GitHub repository
+            Analyze the file structure and statistics of any GitHub repository
           </p>
         </div>
 
         {/* Search */}
         <Card className="mb-8">
           <CardContent className="pt-6">
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="owner/repo or GitHub URL"
-                  value={repoUrl}
-                  onChange={(e) => setRepoUrl(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isAnalyzing}
-                  className="pl-10"
-                />
+            <Collapsible open={showSettings} onOpenChange={setShowSettings}>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="owner/repo or GitHub URL"
+                    value={repoUrl}
+                    onChange={(e) => setRepoUrl(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isAnalyzing}
+                    className="pl-10"
+                  />
+                </div>
+                <Button
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing || !repoUrl.trim()}
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Analyzing
+                    </>
+                  ) : (
+                    'Analyze'
+                  )}
+                </Button>
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    title={token ? 'Token configured' : 'Add GitHub token'}
+                  >
+                    <KeyRound className={`h-4 w-4 ${token ? 'text-green-500' : ''}`} />
+                  </Button>
+                </CollapsibleTrigger>
               </div>
-              <Button
-                onClick={handleAnalyze}
-                disabled={isAnalyzing || !repoUrl.trim()}
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyzing
-                  </>
-                ) : (
-                  'Analyze'
-                )}
-              </Button>
-            </div>
+              <CollapsibleContent>
+                <div className="mt-4 pt-4 border-t">
+                  <div className="flex items-start gap-2">
+                    <KeyRound className="h-4 w-4 mt-2.5 text-muted-foreground shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Input
+                        type="password"
+                        placeholder="GitHub Personal Access Token"
+                        value={token}
+                        onChange={(e) => setToken(e.target.value)}
+                        className="font-mono text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Add a token to access private repos or avoid rate limits.
+                        Token is stored locally in your browser.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </CardContent>
         </Card>
 
@@ -283,7 +318,7 @@ function App() {
         {/* Footer */}
         <div className="text-center mt-12">
           <p className="text-xs text-muted-foreground">
-            Uses the GitHub API to analyze public repositories
+            Uses the GitHub API to analyze repositories
           </p>
         </div>
       </div>

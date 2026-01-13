@@ -3,6 +3,29 @@ import type { FileNode, FileStats, AnalysisResult } from '../types';
 
 const IGNORED_DIRS = new Set(['.git', 'node_modules', '.next', 'dist', 'build', '.cache', '__pycache__', '.venv', 'venv']);
 
+// Token storage
+const TOKEN_STORAGE_KEY = 'repo-analyzer-token';
+
+function getStoredToken(): string {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function storeToken(token: string): void {
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    } else {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+  } catch {
+    // localStorage might be disabled
+  }
+}
+
 // Cache configuration
 const CACHE_KEY_PREFIX = 'repo-analyzer-cache:';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -250,12 +273,28 @@ export function useRepoAnalyzer() {
     isCached: false,
     cachedAt: null,
   });
+  const [token, setTokenState] = useState<string>(getStoredToken);
+
+  const setToken = useCallback((newToken: string) => {
+    setTokenState(newToken);
+    storeToken(newToken);
+  }, []);
+
+  // Build headers with optional auth token
+  const getHeaders = useCallback((): HeadersInit => {
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  }, [token]);
 
   const fetchBranchesAndTags = useCallback(async (owner: string, repoName: string, defaultBranchName: string) => {
+    const headers = getHeaders();
     try {
       const [branchesRes, tagsRes] = await Promise.all([
-        fetch(`https://api.github.com/repos/${owner}/${repoName}/branches?per_page=100`),
-        fetch(`https://api.github.com/repos/${owner}/${repoName}/tags?per_page=100`),
+        fetch(`https://api.github.com/repos/${owner}/${repoName}/branches?per_page=100`, { headers }),
+        fetch(`https://api.github.com/repos/${owner}/${repoName}/tags?per_page=100`, { headers }),
       ]);
 
       if (branchesRes.ok) {
@@ -284,13 +323,15 @@ export function useRepoAnalyzer() {
         setBranches([{ name: defaultBranchName, protected: false }]);
       }
     }
-  }, []);
+  }, [getHeaders]);
 
   const analyze = useCallback(async (repoUrl: string, ref?: string, forceRefresh = false) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
     setCacheInfo({ isCached: false, cachedAt: null });
+
+    const headers = getHeaders();
 
     try {
       const parsed = parseRepoInput(repoUrl);
@@ -304,7 +345,7 @@ export function useRepoAnalyzer() {
       setProgress('Fetching repository info...');
 
       // Get default branch
-      const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`);
+      const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, { headers });
       if (!repoResponse.ok) {
         const errorData = await repoResponse.json().catch(() => null);
         throw new Error(errorData?.message || `Failed to fetch repository: ${repoResponse.statusText}`);
@@ -335,7 +376,8 @@ export function useRepoAnalyzer() {
 
       // Get the tree recursively
       const treeResponse = await fetch(
-        `https://api.github.com/repos/${owner}/${repoName}/git/trees/${targetRef}?recursive=1`
+        `https://api.github.com/repos/${owner}/${repoName}/git/trees/${targetRef}?recursive=1`,
+        { headers }
       );
       if (!treeResponse.ok) {
         const errorData = await treeResponse.json().catch(() => null);
@@ -369,7 +411,7 @@ export function useRepoAnalyzer() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [fetchBranchesAndTags]);
+  }, [fetchBranchesAndTags, getHeaders]);
 
   const analyzeWithRef = useCallback(async (ref: string) => {
     if (!repoInfo) return;
@@ -399,5 +441,7 @@ export function useRepoAnalyzer() {
     selectedRef,
     defaultBranch,
     cacheInfo,
+    token,
+    setToken,
   };
 }
