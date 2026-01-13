@@ -38,7 +38,7 @@ export function BranchSelector({
 
   return (
     <Select value={displayValue} onValueChange={onSelect} disabled={disabled}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-[180px] overflow-hidden" title={displayValue}>
         <SelectValue placeholder="Select ref" />
       </SelectTrigger>
       <SelectContent>
@@ -49,11 +49,11 @@ export function BranchSelector({
               Branches
             </SelectLabel>
             {branches.map((branch) => (
-              <SelectItem key={`branch-${branch.name}`} value={branch.name}>
-                <span className="flex items-center gap-2">
-                  {branch.name}
+              <SelectItem key={`branch-${branch.name}`} value={branch.name} title={branch.name}>
+                <span className="flex max-w-50 items-center gap-2">
+                  <span className="truncate">{branch.name}</span>
                   {branch.name === defaultBranch && (
-                    <span className="bg-muted rounded px-1 text-[10px]">default</span>
+                    <span className="bg-muted shrink-0 rounded px-1 text-[10px]">default</span>
                   )}
                 </span>
               </SelectItem>
@@ -67,8 +67,8 @@ export function BranchSelector({
               Tags
             </SelectLabel>
             {tags.map((tag) => (
-              <SelectItem key={`tag-${tag.name}`} value={tag.name}>
-                {tag.name}
+              <SelectItem key={`tag-${tag.name}`} value={tag.name} title={tag.name}>
+                <span className="max-w-50 truncate">{tag.name}</span>
               </SelectItem>
             ))}
           </SelectGroup>
