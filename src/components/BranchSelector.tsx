@@ -31,8 +31,11 @@ export function BranchSelector({
     return null;
   }
 
+  // Use selectedRef if set, otherwise fall back to defaultBranch
+  const displayValue = selectedRef || defaultBranch;
+
   return (
-    <Select value={selectedRef} onValueChange={onSelect} disabled={disabled}>
+    <Select value={displayValue} onValueChange={onSelect} disabled={disabled}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select ref" />
       </SelectTrigger>

@@ -196,7 +196,7 @@ export function useRepoAnalyzer() {
   const [defaultBranch, setDefaultBranch] = useState<string>('');
   const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null);
 
-  const fetchBranchesAndTags = useCallback(async (owner: string, repoName: string) => {
+  const fetchBranchesAndTags = useCallback(async (owner: string, repoName: string, defaultBranchName: string) => {
     try {
       const [branchesRes, tagsRes] = await Promise.all([
         fetch(`https://api.github.com/repos/${owner}/${repoName}/branches?per_page=100`),
@@ -205,7 +205,17 @@ export function useRepoAnalyzer() {
 
       if (branchesRes.ok) {
         const branchesData: GitHubBranch[] = await branchesRes.json();
+        // Ensure default branch is always in the list
+        const hasDefaultBranch = branchesData.some(b => b.name === defaultBranchName);
+        if (!hasDefaultBranch && defaultBranchName) {
+          branchesData.unshift({ name: defaultBranchName, protected: false });
+        }
         setBranches(branchesData);
+      } else {
+        // If branches fetch fails, at least show the default branch
+        if (defaultBranchName) {
+          setBranches([{ name: defaultBranchName, protected: false }]);
+        }
       }
 
       if (tagsRes.ok) {
@@ -214,6 +224,10 @@ export function useRepoAnalyzer() {
       }
     } catch (err) {
       console.error('Failed to fetch branches/tags:', err);
+      // On error, at least show the default branch
+      if (defaultBranchName) {
+        setBranches([{ name: defaultBranchName, protected: false }]);
+      }
     }
   }, []);
 
@@ -274,7 +288,7 @@ export function useRepoAnalyzer() {
       setProgress('');
 
       // Fetch branches and tags for the selector (in background)
-      fetchBranchesAndTags(owner, repoName);
+      fetchBranchesAndTags(owner, repoName, defaultBranchName);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Analysis failed';
       setError(message);
