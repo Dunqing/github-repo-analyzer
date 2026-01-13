@@ -124,8 +124,8 @@ function FileTreeNode({ node, level = 0, filter = '', forceOpen = false }: FileT
           />
           <span className="truncate font-medium font-mono text-xs">{node.name}</span>
           <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
-            {node.fileCount}
-            {node.directoryCount ? ` / ${node.directoryCount}` : ''}
+            {node.fileCount} {node.fileCount === 1 ? 'file' : 'files'}
+            {node.directoryCount ? `, ${node.directoryCount} ${node.directoryCount === 1 ? 'dir' : 'dirs'}` : ''}
           </span>
         </button>
       </CollapsibleTrigger>
