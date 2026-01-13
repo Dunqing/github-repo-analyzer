@@ -77,6 +77,7 @@ Compare file structures between two branches:
 - **shadcn/ui** components
 - **Recharts** for visualizations
 - **GitHub REST API**
+- **oxlint** + **oxfmt** for linting and formatting
 
 ## Getting Started
 
