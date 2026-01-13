@@ -403,9 +403,22 @@ export function useRepoAnalyzer() {
   }, [])
 
   // Navigate into a subdirectory
-  const navigateToPath = useCallback((path: string) => {
-    setCurrentPath(path)
-  }, [])
+  // Path can be absolute (from breadcrumb going up) or relative (from FileTree going down)
+  const navigateToPath = useCallback(
+    (path: string) => {
+      // Check if path is an ancestor of currentPath (navigating up via breadcrumb)
+      const isAncestor = currentPath === path || currentPath.startsWith(path + "/")
+
+      if (isAncestor || !currentPath) {
+        // Navigating up via breadcrumb, or at root - use path as-is
+        setCurrentPath(path)
+      } else {
+        // Navigating down into subdirectory - join with current path
+        setCurrentPath(`${currentPath}/${path}`)
+      }
+    },
+    [currentPath],
+  )
 
   // Navigate up one level
   const navigateUp = useCallback(() => {
