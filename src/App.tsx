@@ -12,6 +12,7 @@ import {
   KeyRound,
   AlertTriangle,
   Package,
+  X,
 } from "lucide-react"
 import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 
@@ -270,8 +271,18 @@ function App() {
                     onChange={(e) => setRepoUrl(e.target.value)}
                     onKeyDown={handleKeyDown}
                     disabled={isAnalyzing}
-                    className="pl-10"
+                    className="pr-10 pl-10"
                   />
+                  {repoUrl && !isAnalyzing && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 p-0"
+                      onClick={() => setRepoUrl("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
                 <RecentReposDropdown
                   recent={recent}
