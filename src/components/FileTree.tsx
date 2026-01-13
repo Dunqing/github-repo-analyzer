@@ -1,5 +1,5 @@
-import { ChevronRight } from "lucide-react"
 import { useState, useMemo } from "react"
+import ChevronRight from "~icons/lucide/chevron-right"
 
 import type { FileNode } from "@/types"
 

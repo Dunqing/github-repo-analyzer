@@ -1,20 +1,18 @@
-import {
-  Loader2,
-  Search,
-  FolderTree,
-  BarChart3,
-  Github,
-  File,
-  Folder,
-  FileType,
-  HardDrive,
-  RefreshCw,
-  KeyRound,
-  AlertTriangle,
-  Package,
-  X,
-} from "lucide-react"
 import { useState, useCallback, useEffect, useRef, useMemo } from "react"
+import AlertTriangle from "~icons/lucide/alert-triangle"
+import BarChart3 from "~icons/lucide/bar-chart-3"
+import File from "~icons/lucide/file"
+import FileType from "~icons/lucide/file-type"
+import Folder from "~icons/lucide/folder"
+import FolderTree from "~icons/lucide/folder-tree"
+import Github from "~icons/lucide/github"
+import HardDrive from "~icons/lucide/hard-drive"
+import KeyRound from "~icons/lucide/key-round"
+import Loader2 from "~icons/lucide/loader-2"
+import Package from "~icons/lucide/package"
+import RefreshCw from "~icons/lucide/refresh-cw"
+import Search from "~icons/lucide/search"
+import X from "~icons/lucide/x"
 
 import { BranchSelector } from "@/components/BranchSelector"
 import { CopyTreeButton } from "@/components/CopyTreeButton"

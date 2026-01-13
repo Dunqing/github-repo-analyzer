@@ -1,4 +1,5 @@
-import { GitBranch, Tag } from "lucide-react"
+import GitBranch from "~icons/lucide/git-branch"
+import Tag from "~icons/lucide/tag"
 
 import type { GitHubBranch, GitHubTag } from "@/hooks/useRepoAnalyzer"
 

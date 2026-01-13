@@ -1,4 +1,7 @@
-import { ChevronRight, FolderOpen, Home, Loader2 } from "lucide-react"
+import ChevronRight from "~icons/lucide/chevron-right"
+import FolderOpen from "~icons/lucide/folder-open"
+import Home from "~icons/lucide/home"
+import Loader2 from "~icons/lucide/loader-2"
 
 import { Button } from "@/components/ui/button"
 

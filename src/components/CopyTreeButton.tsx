@@ -1,5 +1,7 @@
-import { Copy, Check, ChevronDown } from "lucide-react"
 import { useState } from "react"
+import Check from "~icons/lucide/check"
+import ChevronDown from "~icons/lucide/chevron-down"
+import Copy from "~icons/lucide/copy"
 
 import type { FileNode } from "@/types"
 

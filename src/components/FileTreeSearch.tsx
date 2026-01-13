@@ -1,5 +1,6 @@
-import { Search, X } from "lucide-react"
 import { forwardRef } from "react"
+import Search from "~icons/lucide/search"
+import X from "~icons/lucide/x"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

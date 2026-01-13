@@ -1,4 +1,6 @@
-import { HardDrive, FileBox, TrendingUp } from "lucide-react"
+import FileBox from "~icons/lucide/file-box"
+import HardDrive from "~icons/lucide/hard-drive"
+import TrendingUp from "~icons/lucide/trending-up"
 
 import type { FileStats, FileNode } from "@/types"
 

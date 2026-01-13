@@ -1,5 +1,6 @@
-import { Link, Check } from "lucide-react"
 import { useState } from "react"
+import Check from "~icons/lucide/check"
+import Link from "~icons/lucide/link"
 
 import { Button } from "@/components/ui/button"
 

@@ -1,5 +1,9 @@
-import { Package, ChevronDown, Loader2, AlertCircle, ExternalLink } from "lucide-react"
 import { useState } from "react"
+import AlertCircle from "~icons/lucide/alert-circle"
+import ChevronDown from "~icons/lucide/chevron-down"
+import ExternalLink from "~icons/lucide/external-link"
+import Loader2 from "~icons/lucide/loader-2"
+import Package from "~icons/lucide/package"
 
 import type { DependencyInfo } from "@/lib/dependencyParser"
 

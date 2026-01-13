@@ -1,4 +1,4 @@
-import { Activity } from "lucide-react"
+import Activity from "~icons/lucide/activity"
 
 import type { RateLimitInfo } from "@/hooks/useRateLimit"
 

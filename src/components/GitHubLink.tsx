@@ -1,5 +1,5 @@
-import { ExternalLink } from "lucide-react"
 import { useMemo } from "react"
+import ExternalLink from "~icons/lucide/external-link"
 
 import { Button } from "@/components/ui/button"
 

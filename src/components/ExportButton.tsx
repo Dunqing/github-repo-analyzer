@@ -1,4 +1,4 @@
-import { Download } from "lucide-react"
+import Download from "~icons/lucide/download"
 
 import type { AnalysisResult } from "@/types"
 

@@ -1,4 +1,6 @@
-import { File, Folder, FileType } from "lucide-react"
+import File from "~icons/lucide/file"
+import FileType from "~icons/lucide/file-type"
+import Folder from "~icons/lucide/folder"
 
 import type { FileStats as FileStatsType } from "@/types"
 

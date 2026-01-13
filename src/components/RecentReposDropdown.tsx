@@ -1,4 +1,5 @@
-import { History, Trash2 } from "lucide-react"
+import History from "~icons/lucide/history"
+import Trash2 from "~icons/lucide/trash-2"
 
 import type { RecentRepo } from "@/hooks/useRecentRepos"
 
