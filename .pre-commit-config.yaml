@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: oxlint
+        name: oxlint
+        entry: pnpm lint
+        language: system
+        files: \.(ts|tsx)$
+        pass_filenames: false
