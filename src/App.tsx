@@ -62,10 +62,10 @@ function App() {
     }
   }, [result]);
 
-  const handleAnalyze = useCallback(async () => {
+  const handleAnalyze = useCallback(() => {
     if (!repoUrl.trim()) return;
     setTreeFilter('');
-    await analyze(repoUrl);
+    analyze(repoUrl);
   }, [analyze, repoUrl]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

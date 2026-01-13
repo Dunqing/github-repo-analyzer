@@ -341,8 +341,8 @@ export function useRepoAnalyzer() {
     if (forceRefresh) {
       // Invalidate SWR cache for this repo
       const baseUrl = `https://api.github.com/repos/${parsed.owner}/${parsed.repoName}`;
-      mutate(baseUrl, undefined, { revalidate: true });
-      mutate((key) => typeof key === 'string' && key.startsWith(baseUrl), undefined, { revalidate: true });
+      void mutate(baseUrl, undefined, { revalidate: true });
+      void mutate((key) => typeof key === 'string' && key.startsWith(baseUrl), undefined, { revalidate: true });
     }
   }, []);
 
