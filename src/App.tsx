@@ -438,9 +438,9 @@ function App() {
               )}
             </CardHeader>
             <Separator />
-            <CardContent className="pt-6">
+            <CardContent>
               <Tabs defaultValue="tree">
-                <TabsList className="mb-4">
+                <TabsList>
                   <TabsTrigger value="tree" className="gap-2">
                     <FolderTree className="h-4 w-4" />
                     Tree
