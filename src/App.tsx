@@ -11,11 +11,13 @@ import {
   RefreshCw,
   KeyRound,
   AlertTriangle,
+  Package,
 } from "lucide-react"
 import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 
 import { BranchSelector } from "@/components/BranchSelector"
 import { CopyTreeButton } from "@/components/CopyTreeButton"
+import { DependencyStats } from "@/components/DependencyStats"
 import { ExportButton } from "@/components/ExportButton"
 import { FileSizeStats } from "@/components/FileSizeStats"
 import { FileStats } from "@/components/FileStats"
@@ -34,6 +36,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useDependencies } from "@/hooks/useDependencies"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
 import { useRateLimit } from "@/hooks/useRateLimit"
 import { useRecentRepos } from "@/hooks/useRecentRepos"
@@ -68,6 +71,16 @@ function App() {
 
   const { recent, addRecent, clearRecent } = useRecentRepos()
   const { rateLimit, isLoading: isLoadingRateLimit } = useRateLimit(token)
+  const {
+    dependencies,
+    isLoading: isLoadingDeps,
+    error: depsError,
+  } = useDependencies({
+    repoName: result?.repoName || "",
+    branch: result?.ref || "",
+    token,
+    enabled: !!result?.repoName && !!result?.ref,
+  })
 
   // Add to recent repos when analysis completes
   useEffect(() => {
@@ -440,6 +453,10 @@ function App() {
                     <HardDrive className="h-4 w-4" />
                     Size
                   </TabsTrigger>
+                  <TabsTrigger value="deps" className="gap-2">
+                    <Package className="h-4 w-4" />
+                    Deps
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="tree">
                   {result.repoName && (
@@ -478,6 +495,13 @@ function App() {
                 </TabsContent>
                 <TabsContent value="size">
                   <FileSizeStats stats={result.stats} tree={result.tree} />
+                </TabsContent>
+                <TabsContent value="deps">
+                  <DependencyStats
+                    dependencies={dependencies}
+                    isLoading={isLoadingDeps}
+                    error={depsError}
+                  />
                 </TabsContent>
               </Tabs>
             </CardContent>
