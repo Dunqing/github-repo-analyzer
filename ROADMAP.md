@@ -332,6 +332,9 @@ Better handling of repositories with truncated trees.
 ### Phase 2: Visualizations
 - [x] 2.1 Pie/Donut Chart
 
+### Phase 5: Performance
+- [x] 5.1 Result Caching
+
 ### Foundation
 - [x] Basic repo analysis (file tree, stats)
 - [x] VS Code file icons

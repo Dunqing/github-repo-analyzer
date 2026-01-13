@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType, HardDrive } from 'lucide-react';
+import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType, HardDrive, RefreshCw } from 'lucide-react';
 import { useRepoAnalyzer } from '@/hooks/useRepoAnalyzer';
 import { FileTree, countMatchingFiles } from '@/components/FileTree';
 import { FileStats } from '@/components/FileStats';
@@ -31,6 +31,7 @@ function App() {
     tags,
     selectedRef,
     defaultBranch,
+    cacheInfo,
   } = useRepoAnalyzer();
 
   // Handle URL parameters on mount
@@ -74,7 +75,24 @@ function App() {
     analyzeWithRef(ref);
   }, [analyzeWithRef]);
 
+  const handleRefresh = useCallback(() => {
+    if (!result?.repoName) return;
+    setTreeFilter('');
+    analyze(result.repoName, result.ref, true); // forceRefresh = true
+  }, [analyze, result]);
+
   const matchingCount = result ? countMatchingFiles(result.tree, treeFilter) : 0;
+
+  // Format cache time as relative time
+  const formatCacheTime = (date: Date): string => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    return `${diffHours}h ago`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,8 +184,16 @@ function App() {
                       </Badge>
                     )}
                   </CardTitle>
-                  <CardDescription>
-                    Repository analysis complete
+                  <CardDescription className="flex items-center gap-2">
+                    {cacheInfo.isCached && cacheInfo.cachedAt ? (
+                      <>
+                        <span className="text-muted-foreground">
+                          Cached {formatCacheTime(cacheInfo.cachedAt)}
+                        </span>
+                        <span className="text-muted-foreground/50">•</span>
+                      </>
+                    ) : null}
+                    <span>Repository analysis complete</span>
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
@@ -179,6 +205,17 @@ function App() {
                     onSelect={handleBranchChange}
                     disabled={isAnalyzing}
                   />
+                  {cacheInfo.isCached && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleRefresh}
+                      disabled={isAnalyzing}
+                      title="Refresh (bypass cache)"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
+                    </Button>
+                  )}
                   {result.repoName && (
                     <ShareButton repoName={result.repoName} branch={result.ref} />
                   )}

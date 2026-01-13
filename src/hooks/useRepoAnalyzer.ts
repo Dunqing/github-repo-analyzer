@@ -3,6 +3,57 @@ import type { FileNode, FileStats, AnalysisResult } from '../types';
 
 const IGNORED_DIRS = new Set(['.git', 'node_modules', '.next', 'dist', 'build', '.cache', '__pycache__', '.venv', 'venv']);
 
+// Cache configuration
+const CACHE_KEY_PREFIX = 'repo-analyzer-cache:';
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+interface CacheEntry {
+  data: AnalysisResult;
+  timestamp: number;
+  ttl: number;
+}
+
+function getCacheKey(repoName: string, ref: string): string {
+  return `${CACHE_KEY_PREFIX}${repoName}@${ref}`;
+}
+
+function getFromCache(repoName: string, ref: string): CacheEntry | null {
+  try {
+    const key = getCacheKey(repoName, ref);
+    const cached = localStorage.getItem(key);
+    if (!cached) return null;
+
+    const entry: CacheEntry = JSON.parse(cached);
+    const now = Date.now();
+
+    // Check if cache is expired
+    if (now - entry.timestamp > entry.ttl) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return entry;
+  } catch {
+    return null;
+  }
+}
+
+function saveToCache(result: AnalysisResult): void {
+  if (!result.repoName) return;
+  try {
+    const key = getCacheKey(result.repoName, result.ref ?? 'default');
+    const entry: CacheEntry = {
+      data: result,
+      timestamp: Date.now(),
+      ttl: CACHE_TTL_MS,
+    };
+    localStorage.setItem(key, JSON.stringify(entry));
+  } catch (err) {
+    // localStorage might be full or disabled
+    console.warn('Failed to cache result:', err);
+  }
+}
+
 interface GitHubTreeItem {
   path: string;
   mode: string;
@@ -195,6 +246,10 @@ export function useRepoAnalyzer() {
   const [selectedRef, setSelectedRef] = useState<string>('');
   const [defaultBranch, setDefaultBranch] = useState<string>('');
   const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null);
+  const [cacheInfo, setCacheInfo] = useState<{ isCached: boolean; cachedAt: Date | null }>({
+    isCached: false,
+    cachedAt: null,
+  });
 
   const fetchBranchesAndTags = useCallback(async (owner: string, repoName: string, defaultBranchName: string) => {
     try {
@@ -231,10 +286,11 @@ export function useRepoAnalyzer() {
     }
   }, []);
 
-  const analyze = useCallback(async (repoUrl: string, ref?: string) => {
+  const analyze = useCallback(async (repoUrl: string, ref?: string, forceRefresh = false) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
+    setCacheInfo({ isCached: false, cachedAt: null });
 
     try {
       const parsed = parseRepoInput(repoUrl);
@@ -263,6 +319,20 @@ export function useRepoAnalyzer() {
       const targetRef = ref || defaultBranchName;
       setSelectedRef(targetRef);
 
+      // Check cache unless force refresh is requested
+      const fullRepoName = `${owner}/${repoName}`;
+      if (!forceRefresh) {
+        const cached = getFromCache(fullRepoName, targetRef);
+        if (cached) {
+          setResult(cached.data);
+          setCacheInfo({ isCached: true, cachedAt: new Date(cached.timestamp) });
+          setProgress('');
+          // Still fetch branches/tags in background
+          fetchBranchesAndTags(owner, repoName, defaultBranchName);
+          return;
+        }
+      }
+
       setProgress('Fetching file tree...');
 
       // Get the tree recursively
@@ -284,8 +354,13 @@ export function useRepoAnalyzer() {
       const tree = buildFileTree(treeData.tree, repoName);
       const stats = calculateStats(tree);
 
-      setResult({ tree, stats, repoName: `${owner}/${repoName}`, ref: targetRef });
+      const analysisResult: AnalysisResult = { tree, stats, repoName: fullRepoName, ref: targetRef };
+      setResult(analysisResult);
+      setCacheInfo({ isCached: false, cachedAt: null });
       setProgress('');
+
+      // Save to cache
+      saveToCache(analysisResult);
 
       // Fetch branches and tags for the selector (in background)
       fetchBranchesAndTags(owner, repoName, defaultBranchName);
@@ -324,5 +399,6 @@ export function useRepoAnalyzer() {
     tags,
     selectedRef,
     defaultBranch,
+    cacheInfo,
   };
 }
