@@ -4,7 +4,7 @@
 
 # GitHub Repo Analyzer
 
-A powerful web tool to analyze, visualize, and explore the file structure of any public GitHub repository. Get instant insights into repository composition, file sizes, dependencies, and more.
+A powerful web tool to analyze, visualize, and explore the file structure of any GitHub repository. Get instant insights into repository composition, file sizes, dependencies, and more.
 
 <p align="center">
   <img src="public/screenshot.png" alt="GitHub Repo Analyzer Screenshot" width="800">
