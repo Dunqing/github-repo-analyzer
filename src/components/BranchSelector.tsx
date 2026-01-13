@@ -1,5 +1,7 @@
 import { GitBranch, Tag } from "lucide-react"
+
 import type { GitHubBranch, GitHubTag } from "@/hooks/useRepoAnalyzer"
+
 import {
   Select,
   SelectContent,

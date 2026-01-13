@@ -1,9 +1,11 @@
-import { useState, useMemo } from "react"
 import { ChevronRight } from "lucide-react"
+import { useState, useMemo } from "react"
+
 import type { FileNode } from "@/types"
+
 import { FileIcon } from "@/components/FileIcon"
-import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { cn } from "@/lib/utils"
 
 interface FileTreeProps {
   node: FileNode

@@ -1,5 +1,7 @@
 import { HardDrive, FileBox, TrendingUp } from "lucide-react"
+
 import type { FileStats, FileNode } from "@/types"
+
 import { getIconForExtension, IconDefault } from "@/components/FileIcon"
 import { Progress } from "@/components/ui/progress"
 

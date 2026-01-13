@@ -1,8 +1,10 @@
 import { File, Folder, FileType } from "lucide-react"
+
 import type { FileStats as FileStatsType } from "@/types"
+
 import { getIconForExtension, IconDefault } from "@/components/FileIcon"
-import { Progress } from "@/components/ui/progress"
 import { FileTypeChart } from "@/components/FileTypeChart"
+import { Progress } from "@/components/ui/progress"
 
 interface FileStatsProps {
   stats: FileStatsType

@@ -3,5 +3,6 @@
   "semi": false,
   "experimentalTailwindcss": {
     "functions": ["cn", "clsx", "cva"]
-  }
+  },
+  "experimentalSortImports": {}
 }

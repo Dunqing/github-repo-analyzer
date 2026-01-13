@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react"
 import useSWR, { mutate } from "swr"
+
 import type { FileNode, FileStats, AnalysisResult } from "../types"
 
 const IGNORED_DIRS = new Set([

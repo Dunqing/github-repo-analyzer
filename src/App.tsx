@@ -1,4 +1,3 @@
-import { useState, useCallback, useEffect } from "react"
 import {
   Loader2,
   Search,
@@ -12,22 +11,24 @@ import {
   RefreshCw,
   KeyRound,
 } from "lucide-react"
-import { useRepoAnalyzer } from "@/hooks/useRepoAnalyzer"
-import { FileTree, countMatchingFiles } from "@/components/FileTree"
-import { FileStats } from "@/components/FileStats"
-import { FileSizeStats } from "@/components/FileSizeStats"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { useState, useCallback, useEffect } from "react"
+
 import { BranchSelector } from "@/components/BranchSelector"
-import { FileTreeSearch } from "@/components/FileTreeSearch"
 import { CopyTreeButton } from "@/components/CopyTreeButton"
+import { FileSizeStats } from "@/components/FileSizeStats"
+import { FileStats } from "@/components/FileStats"
+import { FileTree, countMatchingFiles } from "@/components/FileTree"
+import { FileTreeSearch } from "@/components/FileTreeSearch"
 import { ShareButton } from "@/components/ShareButton"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useRepoAnalyzer } from "@/hooks/useRepoAnalyzer"
 import "@/index.css"
 
 function App() {

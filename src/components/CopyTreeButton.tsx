@@ -1,7 +1,8 @@
-import { useState } from "react"
 import { Copy, Check, ChevronDown } from "lucide-react"
+import { useState } from "react"
+
 import type { FileNode } from "@/types"
-import { treeToText, type TreeFormat } from "@/lib/treeToText"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { treeToText, type TreeFormat } from "@/lib/treeToText"
 
 interface CopyTreeButtonProps {
   tree: FileNode
