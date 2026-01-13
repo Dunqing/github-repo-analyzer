@@ -1,5 +1,5 @@
-import { GitBranch, Tag } from 'lucide-react';
-import type { GitHubBranch, GitHubTag } from '@/hooks/useRepoAnalyzer';
+import { GitBranch, Tag } from "lucide-react"
+import type { GitHubBranch, GitHubTag } from "@/hooks/useRepoAnalyzer"
 import {
   Select,
   SelectContent,
@@ -8,15 +8,15 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select"
 
 interface BranchSelectorProps {
-  branches: GitHubBranch[];
-  tags: GitHubTag[];
-  selectedRef: string;
-  defaultBranch: string;
-  onSelect: (ref: string) => void;
-  disabled?: boolean;
+  branches: GitHubBranch[]
+  tags: GitHubTag[]
+  selectedRef: string
+  defaultBranch: string
+  onSelect: (ref: string) => void
+  disabled?: boolean
 }
 
 export function BranchSelector({
@@ -28,11 +28,11 @@ export function BranchSelector({
   disabled,
 }: BranchSelectorProps) {
   if (branches.length === 0 && tags.length === 0) {
-    return null;
+    return null
   }
 
   // Use selectedRef if set, otherwise fall back to defaultBranch
-  const displayValue = selectedRef || defaultBranch;
+  const displayValue = selectedRef || defaultBranch
 
   return (
     <Select value={displayValue} onValueChange={onSelect} disabled={disabled}>
@@ -51,7 +51,7 @@ export function BranchSelector({
                 <span className="flex items-center gap-2">
                   {branch.name}
                   {branch.name === defaultBranch && (
-                    <span className="text-[10px] bg-muted px-1 rounded">default</span>
+                    <span className="bg-muted rounded px-1 text-[10px]">default</span>
                   )}
                 </span>
               </SelectItem>
@@ -73,5 +73,5 @@ export function BranchSelector({
         )}
       </SelectContent>
     </Select>
-  );
+  )
 }

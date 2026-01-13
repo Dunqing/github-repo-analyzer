@@ -1,61 +1,60 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import type { FileStats } from '@/types';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import type { FileStats } from "@/types"
 
 interface FileTypeChartProps {
-  stats: FileStats;
-  maxSlices?: number;
+  stats: FileStats
+  maxSlices?: number
 }
 
 // Chart colors matching theme CSS variables
 const CHART_COLORS = [
-  'var(--color-chart-1)',
-  'var(--color-chart-2)',
-  'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
-  'hsl(200 60% 50%)',
-  'hsl(260 60% 55%)',
-  'hsl(320 60% 50%)',
-  'hsl(100 50% 45%)',
-  'hsl(180 50% 45%)',
-];
+  "var(--color-chart-1)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
+  "hsl(200 60% 50%)",
+  "hsl(260 60% 55%)",
+  "hsl(320 60% 50%)",
+  "hsl(100 50% 45%)",
+  "hsl(180 50% 45%)",
+]
 
 interface ChartDataItem {
-  name: string;
-  value: number;
-  percentage: number;
-  [key: string]: string | number;
+  name: string
+  value: number
+  percentage: number
+  [key: string]: string | number
 }
 
 export function FileTypeChart({ stats, maxSlices = 8 }: FileTypeChartProps) {
-  const sortedExtensions = Object.entries(stats.extensionCounts)
-    .sort((a, b) => b[1] - a[1]);
+  const sortedExtensions = Object.entries(stats.extensionCounts).sort((a, b) => b[1] - a[1])
 
   // Take top N extensions and group rest as "Other"
-  const topExtensions = sortedExtensions.slice(0, maxSlices);
-  const otherExtensions = sortedExtensions.slice(maxSlices);
-  const otherCount = otherExtensions.reduce((sum, [, count]) => sum + count, 0);
+  const topExtensions = sortedExtensions.slice(0, maxSlices)
+  const otherExtensions = sortedExtensions.slice(maxSlices)
+  const otherCount = otherExtensions.reduce((sum, [, count]) => sum + count, 0)
 
   const chartData: ChartDataItem[] = topExtensions.map(([ext, count]) => ({
-    name: ext === 'no-ext' ? 'No extension' : `.${ext}`,
+    name: ext === "no-ext" ? "No extension" : `.${ext}`,
     value: count,
     percentage: (count / stats.totalFiles) * 100,
-  }));
+  }))
 
   if (otherCount > 0) {
     chartData.push({
-      name: 'Other',
+      name: "Other",
       value: otherCount,
       percentage: (otherCount / stats.totalFiles) * 100,
-    });
+    })
   }
 
   return (
     <div className="w-full">
-      <h3 className="text-sm font-medium mb-4">File Type Distribution</h3>
+      <h3 className="mb-4 text-sm font-medium">File Type Distribution</h3>
       <div className="flex items-center gap-4">
         {/* Chart */}
-        <div className="w-48 h-48 shrink-0">
+        <div className="h-48 w-48 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -69,26 +68,23 @@ export function FileTypeChart({ stats, maxSlices = 8 }: FileTypeChartProps) {
                 stroke="none"
               >
                 {chartData.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={CHART_COLORS[index % CHART_COLORS.length]}
-                  />
+                  <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
-                    const data = payload[0].payload as ChartDataItem;
+                    const data = payload[0].payload as ChartDataItem
                     return (
-                      <div className="bg-popover text-popover-foreground border rounded-md px-3 py-2 shadow-md">
+                      <div className="bg-popover text-popover-foreground rounded-md border px-3 py-2 shadow-md">
                         <p className="font-mono text-sm">{data.name}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           {data.value} files ({data.percentage.toFixed(1)}%)
                         </p>
                       </div>
-                    );
+                    )
                   }
-                  return null;
+                  return null
                 }}
               />
             </PieChart>
@@ -96,14 +92,14 @@ export function FileTypeChart({ stats, maxSlices = 8 }: FileTypeChartProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1.5">
+        <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-1.5">
           {chartData.map((item, index) => (
             <div key={item.name} className="flex items-center gap-2 text-xs">
               <span
-                className="w-3 h-3 rounded-sm shrink-0"
+                className="h-3 w-3 shrink-0 rounded-sm"
                 style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
               />
-              <span className="font-mono truncate">{item.name}</span>
+              <span className="truncate font-mono">{item.name}</span>
               <span className="text-muted-foreground ml-auto tabular-nums">
                 {item.percentage.toFixed(0)}%
               </span>
@@ -112,5 +108,5 @@ export function FileTypeChart({ stats, maxSlices = 8 }: FileTypeChartProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

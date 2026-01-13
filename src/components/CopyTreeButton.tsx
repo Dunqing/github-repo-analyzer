@@ -1,39 +1,39 @@
-import { useState } from 'react';
-import { Copy, Check, ChevronDown } from 'lucide-react';
-import type { FileNode } from '@/types';
-import { treeToText, type TreeFormat } from '@/lib/treeToText';
-import { Button } from '@/components/ui/button';
+import { useState } from "react"
+import { Copy, Check, ChevronDown } from "lucide-react"
+import type { FileNode } from "@/types"
+import { treeToText, type TreeFormat } from "@/lib/treeToText"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu"
 
 interface CopyTreeButtonProps {
-  tree: FileNode;
+  tree: FileNode
 }
 
 const FORMAT_LABELS: Record<TreeFormat, string> = {
-  ascii: 'ASCII Tree',
-  markdown: 'Markdown',
-  paths: 'File Paths',
-};
+  ascii: "ASCII Tree",
+  markdown: "Markdown",
+  paths: "File Paths",
+}
 
 export function CopyTreeButton({ tree }: CopyTreeButtonProps) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false)
 
   const handleCopy = async (format: TreeFormat) => {
-    const text = treeToText(tree, format);
+    const text = treeToText(tree, format)
 
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err)
     }
-  };
+  }
 
   return (
     <DropdownMenu>
@@ -61,5 +61,5 @@ export function CopyTreeButton({ tree }: CopyTreeButtonProps) {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

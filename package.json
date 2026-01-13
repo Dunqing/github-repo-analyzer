@@ -1,12 +1,14 @@
 {
   "name": "github-repo-analyzer",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint src -c oxlint.json --tsconfig tsconfig.json --type-aware --type-check",
+    "lint": "oxlint src --tsconfig tsconfig.json --type-aware --type-check",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "preview": "vite preview",
     "prepare": "prek install"
   },
@@ -37,6 +39,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "oxfmt": "^0.24.0",
     "oxlint": "^1.39.0",
     "oxlint-tsgolint": "^0.11.0",
     "tailwindcss": "^4.1.18",

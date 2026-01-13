@@ -7,3 +7,9 @@ repos:
         language: system
         files: \.(ts|tsx)$
         pass_filenames: false
+      - id: oxfmt
+        name: oxfmt
+        entry: pnpm format:check
+        language: system
+        files: \.(ts|tsx|js|jsx|json|css|md|yaml|yml)$
+        pass_filenames: false

@@ -9,10 +9,12 @@ A web tool to analyze the file structure and statistics of any public GitHub rep
 ## Features
 
 ### Input Formats
+
 - Short format: `owner/repo` (e.g., `facebook/react`)
 - Full URL: `https://github.com/owner/repo`
 
 ### File Tree View
+
 - Interactive expandable/collapsible directory tree
 - VS Code file icons for 40+ file types
 - Folder icons with open/closed states
@@ -20,6 +22,7 @@ A web tool to analyze the file structure and statistics of any public GitHub rep
 - Auto-expands first 2 levels by default
 
 ### Statistics View
+
 - Total files count
 - Total directories count
 - Number of unique file types
@@ -27,10 +30,13 @@ A web tool to analyze the file structure and statistics of any public GitHub rep
 - VS Code icons for each file type
 
 ### Smart Filtering
+
 Automatically ignores common non-essential directories:
+
 - `.git`, `node_modules`, `.next`, `dist`, `build`, `.cache`, `__pycache__`, `.venv`, `venv`
 
 ### Modern UI/UX
+
 - **2026 Color Palette**: Cloud Dancer, Mocha Mousse, Digital Lavender, Deep Teal
 - **Dark Mode**: Automatically detects system preference
 - **Responsive Design**: Works on desktop and mobile
@@ -49,6 +55,7 @@ Automatically ignores common non-essential directories:
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - pnpm (recommended) or npm
 

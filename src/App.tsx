@@ -1,26 +1,38 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Loader2, Search, FolderTree, BarChart3, Github, File, Folder, FileType, HardDrive, RefreshCw, KeyRound } from 'lucide-react';
-import { useRepoAnalyzer } from '@/hooks/useRepoAnalyzer';
-import { FileTree, countMatchingFiles } from '@/components/FileTree';
-import { FileStats } from '@/components/FileStats';
-import { FileSizeStats } from '@/components/FileSizeStats';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { BranchSelector } from '@/components/BranchSelector';
-import { FileTreeSearch } from '@/components/FileTreeSearch';
-import { CopyTreeButton } from '@/components/CopyTreeButton';
-import { ShareButton } from '@/components/ShareButton';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import '@/index.css';
+import { useState, useCallback, useEffect } from "react"
+import {
+  Loader2,
+  Search,
+  FolderTree,
+  BarChart3,
+  Github,
+  File,
+  Folder,
+  FileType,
+  HardDrive,
+  RefreshCw,
+  KeyRound,
+} from "lucide-react"
+import { useRepoAnalyzer } from "@/hooks/useRepoAnalyzer"
+import { FileTree, countMatchingFiles } from "@/components/FileTree"
+import { FileStats } from "@/components/FileStats"
+import { FileSizeStats } from "@/components/FileSizeStats"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { BranchSelector } from "@/components/BranchSelector"
+import { FileTreeSearch } from "@/components/FileTreeSearch"
+import { CopyTreeButton } from "@/components/CopyTreeButton"
+import { ShareButton } from "@/components/ShareButton"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import "@/index.css"
 
 function App() {
-  const [repoUrl, setRepoUrl] = useState('');
-  const [treeFilter, setTreeFilter] = useState('');
+  const [repoUrl, setRepoUrl] = useState("")
+  const [treeFilter, setTreeFilter] = useState("")
   const {
     analyze,
     analyzeWithRef,
@@ -35,86 +47,87 @@ function App() {
     cacheInfo,
     token,
     setToken,
-  } = useRepoAnalyzer();
-  const [showSettings, setShowSettings] = useState(false);
+  } = useRepoAnalyzer()
+  const [showSettings, setShowSettings] = useState(false)
 
   // Handle URL parameters on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const repoParam = params.get('repo');
-    const branchParam = params.get('branch');
+    const params = new URLSearchParams(window.location.search)
+    const repoParam = params.get("repo")
+    const branchParam = params.get("branch")
 
     if (repoParam) {
-      setRepoUrl(repoParam);
-      analyze(repoParam, branchParam || undefined);
+      setRepoUrl(repoParam)
+      analyze(repoParam, branchParam || undefined)
     }
-  }, [analyze]);
+  }, [analyze])
 
   // Update URL when analysis completes
   useEffect(() => {
     if (result?.repoName) {
-      const url = new URL(window.location.href);
-      url.searchParams.set('repo', result.repoName);
+      const url = new URL(window.location.href)
+      url.searchParams.set("repo", result.repoName)
       if (result.ref) {
-        url.searchParams.set('branch', result.ref);
+        url.searchParams.set("branch", result.ref)
       }
-      window.history.replaceState({}, '', url.toString());
+      window.history.replaceState({}, "", url.toString())
     }
-  }, [result]);
+  }, [result])
 
   const handleAnalyze = useCallback(() => {
-    if (!repoUrl.trim()) return;
-    setTreeFilter('');
-    analyze(repoUrl);
-  }, [analyze, repoUrl]);
+    if (!repoUrl.trim()) return
+    setTreeFilter("")
+    analyze(repoUrl)
+  }, [analyze, repoUrl])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleAnalyze();
+    if (e.key === "Enter") {
+      handleAnalyze()
     }
-  };
+  }
 
-  const handleBranchChange = useCallback((ref: string) => {
-    setTreeFilter('');
-    analyzeWithRef(ref);
-  }, [analyzeWithRef]);
+  const handleBranchChange = useCallback(
+    (ref: string) => {
+      setTreeFilter("")
+      analyzeWithRef(ref)
+    },
+    [analyzeWithRef],
+  )
 
   const handleRefresh = useCallback(() => {
-    if (!result?.repoName) return;
-    setTreeFilter('');
-    analyze(result.repoName, result.ref, true); // forceRefresh = true
-  }, [analyze, result]);
+    if (!result?.repoName) return
+    setTreeFilter("")
+    analyze(result.repoName, result.ref, true) // forceRefresh = true
+  }, [analyze, result])
 
-  const matchingCount = result ? countMatchingFiles(result.tree, treeFilter) : 0;
+  const matchingCount = result ? countMatchingFiles(result.tree, treeFilter) : 0
 
   // Format cache time as relative time
   const formatCacheTime = (date: Date): string => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    return `${diffHours}h ago`;
-  };
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    if (diffMins < 1) return "just now"
+    if (diffMins < 60) return `${diffMins}m ago`
+    const diffHours = Math.floor(diffMins / 60)
+    return `${diffHours}h ago`
+  }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
 
-      <div className="container max-w-4xl mx-auto px-4 py-16">
+      <div className="container mx-auto max-w-4xl px-4 py-16">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center p-3 rounded-full bg-muted mb-6">
+        <div className="mb-12 text-center">
+          <div className="bg-muted mb-6 inline-flex items-center justify-center rounded-full p-3">
             <Github className="h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight mb-3">
-            GitHub Repo Analyzer
-          </h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
+          <h1 className="mb-3 text-3xl font-bold tracking-tight">GitHub Repo Analyzer</h1>
+          <p className="text-muted-foreground mx-auto max-w-md">
             Analyze the file structure and statistics of any GitHub repository
           </p>
         </div>
@@ -125,7 +138,7 @@ function App() {
             <Collapsible open={showSettings} onOpenChange={setShowSettings}>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                   <Input
                     type="text"
                     placeholder="owner/repo or GitHub URL"
@@ -136,33 +149,30 @@ function App() {
                     className="pl-10"
                   />
                 </div>
-                <Button
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing || !repoUrl.trim()}
-                >
+                <Button onClick={handleAnalyze} disabled={isAnalyzing || !repoUrl.trim()}>
                   {isAnalyzing ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Analyzing
                     </>
                   ) : (
-                    'Analyze'
+                    "Analyze"
                   )}
                 </Button>
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="outline"
                     size="icon"
-                    title={token ? 'Token configured' : 'Add GitHub token'}
+                    title={token ? "Token configured" : "Add GitHub token"}
                   >
-                    <KeyRound className={`h-4 w-4 ${token ? 'text-green-500' : ''}`} />
+                    <KeyRound className={`h-4 w-4 ${token ? "text-green-500" : ""}`} />
                   </Button>
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent>
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-4 border-t pt-4">
                   <div className="flex items-start gap-2">
-                    <KeyRound className="h-4 w-4 mt-2.5 text-muted-foreground shrink-0" />
+                    <KeyRound className="text-muted-foreground mt-2.5 h-4 w-4 shrink-0" />
                     <div className="flex-1 space-y-2">
                       <Input
                         type="password"
@@ -171,9 +181,9 @@ function App() {
                         onChange={(e) => setToken(e.target.value)}
                         className="font-mono text-sm"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Optional: Add a token to access private repos or avoid rate limits.
-                        Token is stored locally in your browser.
+                      <p className="text-muted-foreground text-xs">
+                        Optional: Add a token to access private repos or avoid rate limits. Token is
+                        stored locally in your browser.
                       </p>
                     </div>
                   </div>
@@ -188,8 +198,8 @@ function App() {
           <Card className="mb-8">
             <CardContent className="py-8">
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">{progress || 'Processing...'}</p>
+                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+                <p className="text-muted-foreground text-sm">{progress || "Processing..."}</p>
               </div>
             </CardContent>
           </Card>
@@ -197,9 +207,9 @@ function App() {
 
         {/* Error State */}
         {error && (
-          <Card className="mb-8 border-destructive">
+          <Card className="border-destructive mb-8">
             <CardContent className="py-4">
-              <p className="text-sm text-destructive">{error}</p>
+              <p className="text-destructive text-sm">{error}</p>
             </CardContent>
           </Card>
         )}
@@ -248,7 +258,7 @@ function App() {
                       disabled={isAnalyzing}
                       title="Refresh (bypass cache)"
                     >
-                      <RefreshCw className={`h-4 w-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
                     </Button>
                   )}
                   {result.repoName && (
@@ -289,7 +299,7 @@ function App() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="tree">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="mb-4 flex items-center gap-4">
                     <div className="flex-1">
                       <FileTreeSearch
                         value={treeFilter}
@@ -300,7 +310,7 @@ function App() {
                     </div>
                     <CopyTreeButton tree={result.tree} />
                   </div>
-                  <div className="max-h-[500px] overflow-y-auto -mx-2 px-2">
+                  <div className="-mx-2 max-h-[500px] overflow-y-auto px-2">
                     <FileTree node={result.tree} filter={treeFilter} />
                   </div>
                 </TabsContent>
@@ -316,14 +326,14 @@ function App() {
         )}
 
         {/* Footer */}
-        <div className="text-center mt-12">
-          <p className="text-xs text-muted-foreground">
+        <div className="mt-12 text-center">
+          <p className="text-muted-foreground text-xs">
             Uses the GitHub API to analyze repositories
           </p>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
