@@ -102,10 +102,10 @@ function DependencyList({
                     <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
                   </a>
                 ) : (
-                  <span className="text-muted-foreground font-mono">{dep.name}</span>
+                  <span className="font-mono text-muted-foreground">{dep.name}</span>
                 )}
                 {dep.version && (
-                  <span className="text-muted-foreground/60 font-mono text-[10px]">
+                  <span className="font-mono text-[10px] text-muted-foreground/60">
                     {dep.version}
                   </span>
                 )}
@@ -122,8 +122,8 @@ export function DependencyStats({ dependencies, isLoading, error }: DependencySt
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-        <p className="text-muted-foreground mt-2 text-sm">Scanning for dependencies...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <p className="mt-2 text-sm text-muted-foreground">Scanning for dependencies...</p>
       </div>
     )
   }
@@ -131,8 +131,8 @@ export function DependencyStats({ dependencies, isLoading, error }: DependencySt
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <AlertCircle className="text-destructive h-8 w-8" />
-        <p className="text-destructive mt-2 text-sm">Failed to load dependencies</p>
+        <AlertCircle className="h-8 w-8 text-destructive" />
+        <p className="mt-2 text-sm text-destructive">Failed to load dependencies</p>
       </div>
     )
   }
@@ -140,9 +140,9 @@ export function DependencyStats({ dependencies, isLoading, error }: DependencySt
   if (dependencies.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <Package className="text-muted-foreground h-8 w-8" />
-        <p className="text-muted-foreground mt-2 text-sm">No dependency files found</p>
-        <p className="text-muted-foreground/60 mt-1 text-xs">
+        <Package className="h-8 w-8 text-muted-foreground" />
+        <p className="mt-2 text-sm text-muted-foreground">No dependency files found</p>
+        <p className="mt-1 text-xs text-muted-foreground/60">
           Supported: package.json, requirements.txt, Cargo.toml, go.mod, Gemfile, pom.xml,
           build.gradle, pubspec.yaml
         </p>
@@ -179,7 +179,7 @@ export function DependencyStats({ dependencies, isLoading, error }: DependencySt
               <Badge className={ECOSYSTEM_COLORS[info.ecosystem] || "bg-gray-100 text-gray-800"}>
                 {ECOSYSTEM_LABELS[info.ecosystem] || info.ecosystem}
               </Badge>
-              <span className="text-muted-foreground font-mono text-xs">{info.file}</span>
+              <span className="font-mono text-xs text-muted-foreground">{info.file}</span>
             </div>
 
             <div className="space-y-1">

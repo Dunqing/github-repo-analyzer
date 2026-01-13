@@ -90,14 +90,14 @@ function FileTreeNode({
       <div
         className={cn(
           "flex items-center gap-2 rounded px-2 py-1 text-sm",
-          "hover:bg-muted/50 cursor-default transition-colors",
+          "cursor-default transition-colors hover:bg-muted/50",
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         <FileIcon
           filename={node.name}
           extension={node.extension}
-          className="text-muted-foreground h-4 w-4 shrink-0"
+          className="h-4 w-4 shrink-0 text-muted-foreground"
         />
         <span className="truncate font-mono text-xs">
           <HighlightMatch text={node.name} filter={filter} />
@@ -120,7 +120,7 @@ function FileTreeNode({
         <button
           className={cn(
             "flex w-full items-center gap-2 rounded px-2 py-1 text-sm",
-            "hover:bg-muted/50 text-left transition-colors",
+            "text-left transition-colors hover:bg-muted/50",
             onFolderNavigate && "group",
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -129,13 +129,13 @@ function FileTreeNode({
         >
           <ChevronRight
             className={cn(
-              "text-muted-foreground h-4 w-4 shrink-0 transition-transform",
+              "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
               shouldBeOpen && "rotate-90",
             )}
           />
           <FileIcon isFolder isOpen={shouldBeOpen} className="h-4 w-4 shrink-0" />
           <span className="truncate font-mono text-xs font-medium">{node.name}</span>
-          <span className="text-muted-foreground ml-auto shrink-0 text-[10px]">
+          <span className="ml-auto shrink-0 text-[10px] text-muted-foreground">
             {node.fileCount} {node.fileCount === 1 ? "file" : "files"}
             {node.directoryCount
               ? `, ${node.directoryCount} ${node.directoryCount === 1 ? "dir" : "dirs"}`
@@ -144,7 +144,7 @@ function FileTreeNode({
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="border-border ml-[22px] border-l">
+        <div className="ml-[22px] border-l border-border">
           {node.children?.map((child) => (
             <FileTreeNode
               key={child.path}
@@ -166,7 +166,7 @@ export function FileTree({ node, level = 0, filter = "", onFolderNavigate }: Fil
 
   if (!filteredNode) {
     return (
-      <div className="text-muted-foreground py-8 text-center text-sm">
+      <div className="py-8 text-center text-sm text-muted-foreground">
         No files match "{filter}"
       </div>
     )

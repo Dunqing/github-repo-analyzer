@@ -23,13 +23,13 @@ export function PathBreadcrumb({
 
   return (
     <div
-      className="bg-muted/50 flex items-center gap-1 overflow-x-auto rounded-md border px-2 py-1.5 text-sm"
+      className="flex items-center gap-1 overflow-x-auto rounded-md border bg-muted/50 px-2 py-1.5 text-sm"
       title="Double-click on folders below to navigate into them"
     >
       {isLoading ? (
-        <Loader2 className="text-muted-foreground mr-1 h-4 w-4 shrink-0 animate-spin" />
+        <Loader2 className="mr-1 h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
       ) : (
-        <FolderOpen className="text-muted-foreground mr-1 h-4 w-4 shrink-0" />
+        <FolderOpen className="mr-1 h-4 w-4 shrink-0 text-muted-foreground" />
       )}
       {isAtRoot ? (
         <div className="flex h-6 shrink-0 items-center gap-1 px-1">
@@ -52,7 +52,7 @@ export function PathBreadcrumb({
         const isLast = index === parts.length - 1
         return (
           <div key={pathToHere} className="flex shrink-0 items-center gap-1">
-            <ChevronRight className="text-muted-foreground h-3.5 w-3.5" />
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
             {isLast ? (
               <span className="font-mono text-xs font-medium">{part}</span>
             ) : (
@@ -69,7 +69,7 @@ export function PathBreadcrumb({
         )
       })}
       {isAtRoot && (
-        <span className="text-muted-foreground ml-auto text-[10px] italic">
+        <span className="ml-auto text-[10px] text-muted-foreground italic">
           Double-click folders to navigate
         </span>
       )}

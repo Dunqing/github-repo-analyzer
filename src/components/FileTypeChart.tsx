@@ -77,9 +77,9 @@ export function FileTypeChart({ stats, maxSlices = 8 }: FileTypeChartProps) {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload as ChartDataItem
                     return (
-                      <div className="bg-popover text-popover-foreground rounded-md border px-3 py-2 shadow-md">
+                      <div className="rounded-md border bg-popover px-3 py-2 text-popover-foreground shadow-md">
                         <p className="font-mono text-sm">{data.name}</p>
-                        <p className="text-muted-foreground text-xs">
+                        <p className="text-xs text-muted-foreground">
                           {data.value} files ({data.percentage.toFixed(1)}%)
                         </p>
                       </div>
@@ -101,7 +101,7 @@ export function FileTypeChart({ stats, maxSlices = 8 }: FileTypeChartProps) {
                 style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
               />
               <span className="truncate font-mono">{item.name}</span>
-              <span className="text-muted-foreground ml-auto tabular-nums">
+              <span className="ml-auto text-muted-foreground tabular-nums">
                 {item.percentage.toFixed(0)}%
               </span>
             </div>

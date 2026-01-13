@@ -53,7 +53,7 @@ export function BranchSelector({
                 <span className="flex max-w-50 items-center gap-2">
                   <span className="truncate">{branch.name}</span>
                   {branch.name === defaultBranch && (
-                    <span className="bg-muted shrink-0 rounded px-1 text-[10px]">default</span>
+                    <span className="shrink-0 rounded bg-muted px-1 text-[10px]">default</span>
                   )}
                 </span>
               </SelectItem>

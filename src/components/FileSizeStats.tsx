@@ -200,20 +200,20 @@ export function FileSizeStats({ stats, tree }: FileSizeStatsProps) {
     <div className="space-y-6">
       {/* Size Summary */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
-          <HardDrive className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+        <div className="rounded-lg bg-muted/50 p-4 text-center">
+          <HardDrive className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="text-2xl font-semibold">{formatSize(totalSize)}</p>
-          <p className="text-muted-foreground text-xs">Total Size</p>
+          <p className="text-xs text-muted-foreground">Total Size</p>
         </div>
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
-          <FileBox className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+        <div className="rounded-lg bg-muted/50 p-4 text-center">
+          <FileBox className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="text-2xl font-semibold">{formatSize(averageFileSize)}</p>
-          <p className="text-muted-foreground text-xs">Average File</p>
+          <p className="text-xs text-muted-foreground">Average File</p>
         </div>
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
-          <TrendingUp className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+        <div className="rounded-lg bg-muted/50 p-4 text-center">
+          <TrendingUp className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="text-2xl font-semibold">{formatSize(largestFiles[0]?.size || 0)}</p>
-          <p className="text-muted-foreground text-xs">Largest File</p>
+          <p className="text-xs text-muted-foreground">Largest File</p>
         </div>
       </div>
 
@@ -227,14 +227,14 @@ export function FileSizeStats({ stats, tree }: FileSizeStatsProps) {
               return (
                 <div
                   key={file.path}
-                  className="hover:bg-muted/50 flex items-center gap-3 rounded px-2 py-1.5"
+                  className="flex items-center gap-3 rounded px-2 py-1.5 hover:bg-muted/50"
                 >
-                  <span className="text-muted-foreground w-5 text-xs">{index + 1}.</span>
+                  <span className="w-5 text-xs text-muted-foreground">{index + 1}.</span>
                   <Icon className="h-4 w-4 shrink-0" />
                   <span className="flex-1 truncate font-mono text-xs" title={file.path}>
                     {file.path}
                   </span>
-                  <span className="text-muted-foreground text-xs tabular-nums">
+                  <span className="text-xs text-muted-foreground tabular-nums">
                     {formatSize(file.size || 0)}
                   </span>
                 </div>
@@ -259,7 +259,7 @@ export function FileSizeStats({ stats, tree }: FileSizeStatsProps) {
                     <Icon className="h-4 w-4 shrink-0" />
                     {ext === "no-ext" ? "(no extension)" : `.${ext}`}
                   </span>
-                  <span className="text-muted-foreground text-xs tabular-nums">
+                  <span className="text-xs text-muted-foreground tabular-nums">
                     {formatSize(size)} ({sizePercentage}%)
                   </span>
                 </div>
@@ -275,11 +275,11 @@ export function FileSizeStats({ stats, tree }: FileSizeStatsProps) {
         <div>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-sm font-medium">Lines of Code (Estimate)</h3>
-            <span className="bg-muted text-muted-foreground rounded px-2 py-0.5 text-xs">
+            <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
               ~{formatNumber(locEstimate.total)} total
             </span>
           </div>
-          <p className="text-muted-foreground mb-4 text-xs">
+          <p className="mb-4 text-xs text-muted-foreground">
             Estimated based on file sizes and typical bytes-per-line for each language.
           </p>
           <div className="space-y-3">
@@ -293,7 +293,7 @@ export function FileSizeStats({ stats, tree }: FileSizeStatsProps) {
                     <span className="flex items-center gap-2 font-mono text-xs">
                       <Icon className="h-4 w-4 shrink-0" />.{ext}
                     </span>
-                    <span className="text-muted-foreground text-xs tabular-nums">
+                    <span className="text-xs text-muted-foreground tabular-nums">
                       {formatNumber(loc)} lines ({locPercentage}%)
                     </span>
                   </div>

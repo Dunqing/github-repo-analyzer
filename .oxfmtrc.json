@@ -2,6 +2,7 @@
   "$schema": "node_modules/oxfmt/configuration_schema.json",
   "semi": false,
   "experimentalTailwindcss": {
+    "stylesheet": "./src/index.css",
     "functions": ["cn", "clsx", "cva"]
   },
   "experimentalSortImports": {}

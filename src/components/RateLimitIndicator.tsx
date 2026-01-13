@@ -46,7 +46,7 @@ export function RateLimitIndicator({ rateLimit, isLoading }: RateLimitIndicatorP
       <Activity className="h-3 w-3" />
       {rateLimit.remaining}/{rateLimit.limit}
       {(isLow || isExhausted) && (
-        <span className="text-muted-foreground ml-1 text-[10px]">
+        <span className="ml-1 text-[10px] text-muted-foreground">
           ({formatResetTime(rateLimit.resetAt)})
         </span>
       )}

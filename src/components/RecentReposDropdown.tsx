@@ -59,7 +59,7 @@ export function RecentReposDropdown({
             className="flex items-center justify-between"
           >
             <span className="truncate font-mono text-sm">{repo.repoName}</span>
-            <span className="text-muted-foreground ml-2 shrink-0 text-xs">
+            <span className="ml-2 shrink-0 text-xs text-muted-foreground">
               {formatRelativeTime(repo.analyzedAt)}
             </span>
           </DropdownMenuItem>

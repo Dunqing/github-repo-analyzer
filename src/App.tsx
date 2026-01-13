@@ -237,7 +237,7 @@ function App() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen bg-background">
       {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
@@ -246,11 +246,11 @@ function App() {
       <div className="container mx-auto max-w-4xl px-4 py-16">
         {/* Header */}
         <div className="mb-12 text-center">
-          <div className="bg-muted mb-6 inline-flex items-center justify-center rounded-full p-3">
+          <div className="mb-6 inline-flex items-center justify-center rounded-full bg-muted p-3">
             <Github className="h-8 w-8" />
           </div>
           <h1 className="mb-3 text-3xl font-bold tracking-tight">GitHub Repo Analyzer</h1>
-          <p className="text-muted-foreground mx-auto max-w-md">
+          <p className="mx-auto max-w-md text-muted-foreground">
             Analyze the file structure and statistics of any GitHub repository
           </p>
         </div>
@@ -261,7 +261,7 @@ function App() {
             <Collapsible open={showSettings} onOpenChange={setShowSettings}>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     ref={repoInputRef}
                     type="text"
@@ -302,7 +302,7 @@ function App() {
               <CollapsibleContent>
                 <div className="mt-4 border-t pt-4">
                   <div className="flex items-start gap-2">
-                    <KeyRound className="text-muted-foreground mt-2.5 h-4 w-4 shrink-0" />
+                    <KeyRound className="mt-2.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <div className="flex-1 space-y-2">
                       <Input
                         type="password"
@@ -311,7 +311,7 @@ function App() {
                         onChange={(e) => setToken(e.target.value)}
                         className="font-mono text-sm"
                       />
-                      <p className="text-muted-foreground text-xs">
+                      <p className="text-xs text-muted-foreground">
                         Optional: Add a token to access private repos or avoid rate limits. Token is
                         stored locally in your browser.
                       </p>
@@ -328,8 +328,8 @@ function App() {
           <Card className="mb-8">
             <CardContent className="py-8">
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-                <p className="text-muted-foreground text-sm">{progress || "Processing..."}</p>
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">{progress || "Processing..."}</p>
               </div>
             </CardContent>
           </Card>
@@ -337,9 +337,9 @@ function App() {
 
         {/* Error State */}
         {error && (
-          <Card className="border-destructive mb-8">
+          <Card className="mb-8 border-destructive">
             <CardContent className="py-4">
-              <p className="text-destructive text-sm">{error}</p>
+              <p className="text-sm text-destructive">{error}</p>
             </CardContent>
           </Card>
         )}
@@ -429,7 +429,7 @@ function App() {
                     <p className="font-medium text-yellow-700 dark:text-yellow-400">
                       Large repository - tree truncated
                     </p>
-                    <p className="text-muted-foreground mt-1 text-xs">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       GitHub limits tree responses to ~100k entries. Double-click on folders to
                       navigate into subdirectories and see their full contents.
                     </p>
@@ -511,7 +511,7 @@ function App() {
         {/* Footer */}
         <div className="mt-12 flex flex-col items-center gap-2">
           <RateLimitIndicator rateLimit={rateLimit} isLoading={isLoadingRateLimit} />
-          <p className="text-muted-foreground text-xs">
+          <p className="text-xs text-muted-foreground">
             Uses the GitHub API to analyze repositories
           </p>
         </div>

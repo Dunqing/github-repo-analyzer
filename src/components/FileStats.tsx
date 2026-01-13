@@ -20,20 +20,20 @@ export function FileStats({ stats }: FileStatsProps) {
     <div className="space-y-6">
       {/* Stats Summary */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
-          <File className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+        <div className="rounded-lg bg-muted/50 p-4 text-center">
+          <File className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="text-2xl font-semibold">{stats.totalFiles}</p>
-          <p className="text-muted-foreground text-xs">Files</p>
+          <p className="text-xs text-muted-foreground">Files</p>
         </div>
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
-          <Folder className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+        <div className="rounded-lg bg-muted/50 p-4 text-center">
+          <Folder className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="text-2xl font-semibold">{stats.totalDirectories}</p>
-          <p className="text-muted-foreground text-xs">Directories</p>
+          <p className="text-xs text-muted-foreground">Directories</p>
         </div>
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
-          <FileType className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+        <div className="rounded-lg bg-muted/50 p-4 text-center">
+          <FileType className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="text-2xl font-semibold">{sortedExtensions.length}</p>
-          <p className="text-muted-foreground text-xs">File Types</p>
+          <p className="text-xs text-muted-foreground">File Types</p>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ export function FileStats({ stats }: FileStatsProps) {
                     <Icon className="h-4 w-4 shrink-0" />
                     {ext === "no-ext" ? "(no extension)" : `.${ext}`}
                   </span>
-                  <span className="text-muted-foreground text-xs tabular-nums">
+                  <span className="text-xs text-muted-foreground tabular-nums">
                     {count} ({filePercentage}%)
                   </span>
                 </div>
