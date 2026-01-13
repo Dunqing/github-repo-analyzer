@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo } from "react"
 import useSWR, { mutate } from "swr"
 
+import { getCacheTimestamp, clearCache } from "@/lib/swr-cache-provider"
+
 import type { FileNode, FileStats, AnalysisResult } from "../types"
 
 const IGNORED_DIRS = new Set([
@@ -352,15 +354,17 @@ export function useRepoAnalyzer() {
     return ""
   }, [isLoadingRepo, isLoadingTree])
 
-  // Check if result is from SWR cache
+  // Check if result is from localStorage cache
   const cacheInfo = useMemo(() => {
-    // SWR doesn't expose cache timestamp directly, but we can infer from state
-    // If we have result and not loading, and it came immediately, it's cached
-    return {
-      isCached: false, // SWR handles caching transparently
-      cachedAt: null as Date | null,
+    if (!treeKey) {
+      return { isCached: false, cachedAt: null as Date | null }
     }
-  }, [])
+    const cachedAt = getCacheTimestamp(treeKey)
+    return {
+      isCached: cachedAt !== null,
+      cachedAt,
+    }
+  }, [treeKey])
 
   const analyze = useCallback((repoUrl: string, ref?: string, forceRefresh = false) => {
     const parsed = parseRepoInput(repoUrl)
@@ -373,7 +377,8 @@ export function useRepoAnalyzer() {
     setCurrentPath("") // Reset path when analyzing new repo
 
     if (forceRefresh) {
-      // Invalidate SWR cache for this repo
+      // Invalidate both SWR and localStorage cache
+      clearCache()
       const baseUrl = `https://api.github.com/repos/${parsed.owner}/${parsed.repoName}`
       void mutate(baseUrl, undefined, { revalidate: true })
       void mutate((key) => typeof key === "string" && key.startsWith(baseUrl), undefined, {
