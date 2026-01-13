@@ -12,7 +12,7 @@ import {
   KeyRound,
   AlertTriangle,
 } from "lucide-react"
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 
 import { BranchSelector } from "@/components/BranchSelector"
 import { CopyTreeButton } from "@/components/CopyTreeButton"
@@ -34,14 +34,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
 import { useRateLimit } from "@/hooks/useRateLimit"
 import { useRecentRepos } from "@/hooks/useRecentRepos"
 import { useRepoAnalyzer } from "@/hooks/useRepoAnalyzer"
+import { treeToText } from "@/lib/treeToText"
 import "@/index.css"
 
 function App() {
   const [repoUrl, setRepoUrl] = useState("")
   const [treeFilter, setTreeFilter] = useState("")
+  const repoInputRef = useRef<HTMLInputElement>(null)
+  const treeSearchRef = useRef<HTMLInputElement>(null)
   const {
     analyze,
     analyzeWithRef,
@@ -171,6 +175,43 @@ function App() {
 
   const matchingCount = result ? countMatchingFiles(result.tree, treeFilter) : 0
 
+  // Keyboard shortcut handlers
+  const keyboardHandlers = useMemo(
+    () => ({
+      onFocusSearch: () => {
+        treeSearchRef.current?.focus()
+      },
+      onFocusRepoInput: () => {
+        repoInputRef.current?.focus()
+      },
+      onAnalyze: () => {
+        if (repoUrl.trim() && !isAnalyzing) {
+          handleAnalyze()
+        }
+      },
+      onCopyTree: async () => {
+        if (result?.tree) {
+          const text = treeToText(result.tree, "ascii")
+          try {
+            await navigator.clipboard.writeText(text)
+          } catch (err) {
+            console.error("Failed to copy tree:", err)
+          }
+        }
+      },
+      onClearSearch: () => {
+        if (treeFilter) {
+          setTreeFilter("")
+        } else if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur()
+        }
+      },
+    }),
+    [result?.tree, repoUrl, isAnalyzing, handleAnalyze, treeFilter],
+  )
+
+  useKeyboardShortcuts(keyboardHandlers)
+
   // Format cache time as relative time
   const formatCacheTime = (date: Date): string => {
     const now = new Date()
@@ -209,8 +250,9 @@ function App() {
                 <div className="relative flex-1">
                   <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                   <Input
+                    ref={repoInputRef}
                     type="text"
-                    placeholder="owner/repo or GitHub URL"
+                    placeholder="owner/repo or GitHub URL (press /)"
                     value={repoUrl}
                     onChange={(e) => setRepoUrl(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -414,6 +456,7 @@ function App() {
                   <div className="mb-4 flex items-center gap-4">
                     <div className="flex-1">
                       <FileTreeSearch
+                        ref={treeSearchRef}
                         value={treeFilter}
                         onChange={setTreeFilter}
                         matchCount={matchingCount}
