@@ -34,18 +34,13 @@ export function ShareButton({ repoName, branch, path }: ShareButtonProps) {
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
-      {copied ? (
-        <>
-          <Check className="h-3.5 w-3.5" />
-          Copied
-        </>
-      ) : (
-        <>
-          <Link className="h-3.5 w-3.5" />
-          Share
-        </>
-      )}
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={handleCopy}
+      title={copied ? "Copied!" : "Copy share link"}
+    >
+      {copied ? <Check className="h-4 w-4" /> : <Link className="h-4 w-4" />}
     </Button>
   )
 }

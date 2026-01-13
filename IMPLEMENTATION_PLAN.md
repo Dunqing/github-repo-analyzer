@@ -70,7 +70,7 @@ function handleExport(result: AnalysisResult) {
 - [ ] Filename includes repo name
 - [ ] All data fields present
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
@@ -144,7 +144,7 @@ export function useRecentRepos() {
 - [ ] Duplicates are updated, not added
 - [ ] Clear history works
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
@@ -199,7 +199,7 @@ export function GitHubLink({ repoName, branch, path }: GitHubLinkProps) {
 - [ ] Correct URL with path
 - [ ] Opens in new tab
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
@@ -259,7 +259,7 @@ async function fetcher<T>(
 - [ ] Warning states work
 - [ ] Shows reset time on hover
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
@@ -336,7 +336,7 @@ function isInputFocused(): boolean {
 - [ ] Don't interfere with typing
 - [ ] Work across browsers
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
@@ -405,7 +405,7 @@ export function useBranchCompare(repoName: string, branchA: string, branchB: str
 - [ ] Handles empty branches
 - [ ] Performance with large repos
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
@@ -507,7 +507,7 @@ function parsePackageJson(content: string): DependencyInfo {
 - [ ] Handles missing files gracefully
 - [ ] Shows "No dependencies found" appropriately
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 

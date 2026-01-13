@@ -16,11 +16,15 @@ import { useState, useCallback, useEffect } from "react"
 
 import { BranchSelector } from "@/components/BranchSelector"
 import { CopyTreeButton } from "@/components/CopyTreeButton"
+import { ExportButton } from "@/components/ExportButton"
 import { FileSizeStats } from "@/components/FileSizeStats"
 import { FileStats } from "@/components/FileStats"
 import { FileTree, countMatchingFiles } from "@/components/FileTree"
 import { FileTreeSearch } from "@/components/FileTreeSearch"
+import { GitHubLink } from "@/components/GitHubLink"
 import { PathBreadcrumb } from "@/components/PathBreadcrumb"
+import { RateLimitIndicator } from "@/components/RateLimitIndicator"
+import { RecentReposDropdown } from "@/components/RecentReposDropdown"
 import { ShareButton } from "@/components/ShareButton"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +34,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useRateLimit } from "@/hooks/useRateLimit"
+import { useRecentRepos } from "@/hooks/useRecentRepos"
 import { useRepoAnalyzer } from "@/hooks/useRepoAnalyzer"
 import "@/index.css"
 
@@ -55,6 +61,26 @@ function App() {
     navigateToPath,
     navigateToRoot,
   } = useRepoAnalyzer()
+
+  const { recent, addRecent, clearRecent } = useRecentRepos()
+  const { rateLimit, isLoading: isLoadingRateLimit } = useRateLimit(token)
+
+  // Add to recent repos when analysis completes
+  useEffect(() => {
+    if (result?.repoName && !isAnalyzing) {
+      addRecent(result.repoName, result.ref)
+    }
+  }, [result?.repoName, result?.ref, isAnalyzing, addRecent])
+
+  // Handle selecting a recent repo
+  const handleSelectRecent = useCallback(
+    (repoName: string, branch?: string) => {
+      setRepoUrl(repoName)
+      setTreeFilter("")
+      analyze(repoName, branch)
+    },
+    [analyze],
+  )
 
   // Wrap navigation to also reset filter
   const handleNavigateToPath = useCallback(
@@ -192,6 +218,12 @@ function App() {
                     className="pl-10"
                   />
                 </div>
+                <RecentReposDropdown
+                  recent={recent}
+                  onSelect={handleSelectRecent}
+                  onClear={clearRecent}
+                  disabled={isAnalyzing}
+                />
                 <Button onClick={handleAnalyze} disabled={isAnalyzing || !repoUrl.trim()}>
                   {isAnalyzing ? (
                     <>
@@ -305,11 +337,19 @@ function App() {
                     </Button>
                   )}
                   {result.repoName && (
-                    <ShareButton
-                      repoName={result.repoName}
-                      branch={result.ref}
-                      path={currentPath}
-                    />
+                    <>
+                      <ExportButton result={result} />
+                      <GitHubLink
+                        repoName={result.repoName}
+                        branch={result.ref}
+                        path={currentPath}
+                      />
+                      <ShareButton
+                        repoName={result.repoName}
+                        branch={result.ref}
+                        path={currentPath}
+                      />
+                    </>
                   )}
                 </div>
               </div>
@@ -402,7 +442,8 @@ function App() {
         )}
 
         {/* Footer */}
-        <div className="mt-12 text-center">
+        <div className="mt-12 flex flex-col items-center gap-2">
+          <RateLimitIndicator rateLimit={rateLimit} isLoading={isLoadingRateLimit} />
           <p className="text-muted-foreground text-xs">
             Uses the GitHub API to analyze repositories
           </p>
