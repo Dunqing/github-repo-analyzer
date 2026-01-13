@@ -254,7 +254,7 @@ function App() {
             GitHub Repo Analyzer
           </h1>
           <p className="mx-auto max-w-md text-sm text-muted-foreground sm:text-base">
-            Analyze the file structure and statistics of any GitHub repository
+            Explore file trees, visualize stats, and uncover dependencies in any GitHub repository
           </p>
         </div>
 
