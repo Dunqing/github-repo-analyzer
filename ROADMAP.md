@@ -322,6 +322,14 @@ Better handling of repositories with truncated trees.
 
 ## Completed
 
+### Phase 1: Core Enhancements
+- [x] 1.1 Branch/Tag Selector
+- [x] 1.2 Search/Filter Files
+- [x] 1.3 Share via URL
+- [x] 1.4 File Size Statistics
+- [x] 1.5 Copy Tree as Text
+
+### Foundation
 - [x] Basic repo analysis (file tree, stats)
 - [x] VS Code file icons
 - [x] Short format support (`owner/repo`)
