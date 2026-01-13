@@ -3,7 +3,7 @@ import {
   Search,
   FolderTree,
   BarChart3,
-  GithubIcon,
+  Github,
   File,
   Folder,
   FileType,
@@ -248,7 +248,7 @@ function App() {
         {/* Header */}
         <div className="mb-8 text-center sm:mb-12">
           <div className="mb-4 inline-flex items-center justify-center rounded-full bg-muted p-3 sm:mb-6">
-            <GithubIcon className="h-6 w-6 sm:h-8 sm:w-8" />
+            <Github className="h-6 w-6 sm:h-8 sm:w-8" />
           </div>
           <h1 className="mb-2 text-2xl font-bold tracking-tight sm:mb-3 sm:text-3xl">
             GitHub Repo Analyzer
@@ -532,9 +532,21 @@ function App() {
         {/* Footer */}
         <div className="mt-8 flex flex-col items-center gap-2 sm:mt-12">
           <RateLimitIndicator rateLimit={rateLimit} isLoading={isLoadingRateLimit} />
-          <p className="text-center text-xs text-muted-foreground">
-            Uses the GitHub API to analyze repositories
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-center text-xs text-muted-foreground">
+              Uses the GitHub API to analyze repositories
+            </p>
+            <span className="text-muted-foreground/50">•</span>
+            <a
+              href="https://github.com/Dunqing/github-repo-analyzer"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Github className="h-3.5 w-3.5" />
+              Source
+            </a>
+          </div>
         </div>
       </div>
     </div>

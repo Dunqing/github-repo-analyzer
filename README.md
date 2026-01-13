@@ -82,7 +82,7 @@ Compare file structures between two branches:
 
 ```bash
 # Clone the repository
-git clone https://github.com/user/github-repo-analyzer.git
+git clone https://github.com/Dunqing/github-repo-analyzer.git
 cd github-repo-analyzer
 
 # Install dependencies
