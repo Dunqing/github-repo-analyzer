@@ -69,7 +69,7 @@ export function PathBreadcrumb({
         )
       })}
       {isAtRoot && (
-        <span className="ml-auto text-[10px] text-muted-foreground italic">
+        <span className="ml-auto hidden text-[10px] text-muted-foreground italic sm:inline">
           Double-click folders to navigate
         </span>
       )}

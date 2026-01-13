@@ -38,7 +38,7 @@ export function BranchSelector({
 
   return (
     <Select value={displayValue} onValueChange={onSelect} disabled={disabled}>
-      <SelectTrigger className="w-[180px] overflow-hidden" title={displayValue}>
+      <SelectTrigger className="w-full overflow-hidden sm:w-45" title={displayValue}>
         <SelectValue placeholder="Select ref" />
       </SelectTrigger>
       <SelectContent>

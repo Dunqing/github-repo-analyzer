@@ -199,21 +199,23 @@ export function FileSizeStats({ stats, tree }: FileSizeStatsProps) {
   return (
     <div className="space-y-6">
       {/* Size Summary */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-lg bg-muted/50 p-4 text-center">
-          <HardDrive className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-          <p className="text-2xl font-semibold">{formatSize(totalSize)}</p>
-          <p className="text-xs text-muted-foreground">Total Size</p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="rounded-lg bg-muted/50 p-2 text-center sm:p-4">
+          <HardDrive className="mx-auto mb-1 h-4 w-4 text-muted-foreground sm:mb-2 sm:h-5 sm:w-5" />
+          <p className="text-lg font-semibold sm:text-2xl">{formatSize(totalSize)}</p>
+          <p className="text-[10px] text-muted-foreground sm:text-xs">Total</p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-4 text-center">
-          <FileBox className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-          <p className="text-2xl font-semibold">{formatSize(averageFileSize)}</p>
-          <p className="text-xs text-muted-foreground">Average File</p>
+        <div className="rounded-lg bg-muted/50 p-2 text-center sm:p-4">
+          <FileBox className="mx-auto mb-1 h-4 w-4 text-muted-foreground sm:mb-2 sm:h-5 sm:w-5" />
+          <p className="text-lg font-semibold sm:text-2xl">{formatSize(averageFileSize)}</p>
+          <p className="text-[10px] text-muted-foreground sm:text-xs">Average</p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-4 text-center">
-          <TrendingUp className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-          <p className="text-2xl font-semibold">{formatSize(largestFiles[0]?.size || 0)}</p>
-          <p className="text-xs text-muted-foreground">Largest File</p>
+        <div className="rounded-lg bg-muted/50 p-2 text-center sm:p-4">
+          <TrendingUp className="mx-auto mb-1 h-4 w-4 text-muted-foreground sm:mb-2 sm:h-5 sm:w-5" />
+          <p className="text-lg font-semibold sm:text-2xl">
+            {formatSize(largestFiles[0]?.size || 0)}
+          </p>
+          <p className="text-[10px] text-muted-foreground sm:text-xs">Largest</p>
         </div>
       </div>
 

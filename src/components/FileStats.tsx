@@ -19,21 +19,21 @@ export function FileStats({ stats }: FileStatsProps) {
   return (
     <div className="space-y-6">
       {/* Stats Summary */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-lg bg-muted/50 p-4 text-center">
-          <File className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-          <p className="text-2xl font-semibold">{stats.totalFiles}</p>
-          <p className="text-xs text-muted-foreground">Files</p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="rounded-lg bg-muted/50 p-2 text-center sm:p-4">
+          <File className="mx-auto mb-1 h-4 w-4 text-muted-foreground sm:mb-2 sm:h-5 sm:w-5" />
+          <p className="text-lg font-semibold sm:text-2xl">{stats.totalFiles}</p>
+          <p className="text-[10px] text-muted-foreground sm:text-xs">Files</p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-4 text-center">
-          <Folder className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-          <p className="text-2xl font-semibold">{stats.totalDirectories}</p>
-          <p className="text-xs text-muted-foreground">Directories</p>
+        <div className="rounded-lg bg-muted/50 p-2 text-center sm:p-4">
+          <Folder className="mx-auto mb-1 h-4 w-4 text-muted-foreground sm:mb-2 sm:h-5 sm:w-5" />
+          <p className="text-lg font-semibold sm:text-2xl">{stats.totalDirectories}</p>
+          <p className="text-[10px] text-muted-foreground sm:text-xs">Dirs</p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-4 text-center">
-          <FileType className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-          <p className="text-2xl font-semibold">{sortedExtensions.length}</p>
-          <p className="text-xs text-muted-foreground">File Types</p>
+        <div className="rounded-lg bg-muted/50 p-2 text-center sm:p-4">
+          <FileType className="mx-auto mb-1 h-4 w-4 text-muted-foreground sm:mb-2 sm:h-5 sm:w-5" />
+          <p className="text-lg font-semibold sm:text-2xl">{sortedExtensions.length}</p>
+          <p className="text-[10px] text-muted-foreground sm:text-xs">Types</p>
         </div>
       </div>
 

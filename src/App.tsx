@@ -3,7 +3,7 @@ import {
   Search,
   FolderTree,
   BarChart3,
-  Github,
+  GithubIcon,
   File,
   Folder,
   FileType,
@@ -244,14 +244,16 @@ function App() {
         <ThemeToggle />
       </div>
 
-      <div className="container mx-auto max-w-4xl px-4 py-16">
+      <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-16">
         {/* Header */}
-        <div className="mb-12 text-center">
-          <div className="mb-6 inline-flex items-center justify-center rounded-full bg-muted p-3">
-            <Github className="h-8 w-8" />
+        <div className="mb-8 text-center sm:mb-12">
+          <div className="mb-4 inline-flex items-center justify-center rounded-full bg-muted p-3 sm:mb-6">
+            <GithubIcon className="h-6 w-6 sm:h-8 sm:w-8" />
           </div>
-          <h1 className="mb-3 text-3xl font-bold tracking-tight">GitHub Repo Analyzer</h1>
-          <p className="mx-auto max-w-md text-muted-foreground">
+          <h1 className="mb-2 text-2xl font-bold tracking-tight sm:mb-3 sm:text-3xl">
+            GitHub Repo Analyzer
+          </h1>
+          <p className="mx-auto max-w-md text-sm text-muted-foreground sm:text-base">
             Analyze the file structure and statistics of any GitHub repository
           </p>
         </div>
@@ -260,13 +262,13 @@ function App() {
         <Card className="mb-8">
           <CardContent className="pt-6">
             <Collapsible open={showSettings} onOpenChange={setShowSettings}>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="relative flex-1">
                   <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     ref={repoInputRef}
                     type="text"
-                    placeholder="owner/repo or GitHub URL (press /)"
+                    placeholder="owner/repo or GitHub URL"
                     value={repoUrl}
                     onChange={(e) => setRepoUrl(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -284,31 +286,37 @@ function App() {
                     </Button>
                   )}
                 </div>
-                <RecentReposDropdown
-                  recent={recent}
-                  onSelect={handleSelectRecent}
-                  onClear={clearRecent}
-                  disabled={isAnalyzing}
-                />
-                <Button onClick={handleAnalyze} disabled={isAnalyzing || !repoUrl.trim()}>
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Analyzing
-                    </>
-                  ) : (
-                    "Analyze"
-                  )}
-                </Button>
-                <CollapsibleTrigger asChild>
+                <div className="flex gap-2">
+                  <RecentReposDropdown
+                    recent={recent}
+                    onSelect={handleSelectRecent}
+                    onClear={clearRecent}
+                    disabled={isAnalyzing}
+                  />
                   <Button
-                    variant="outline"
-                    size="icon"
-                    title={token ? "Token configured" : "Add GitHub token"}
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing || !repoUrl.trim()}
+                    className="flex-1 sm:flex-none"
                   >
-                    <KeyRound className={`h-4 w-4 ${token ? "text-green-500" : ""}`} />
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="sm:inline">Analyzing</span>
+                      </>
+                    ) : (
+                      "Analyze"
+                    )}
                   </Button>
-                </CollapsibleTrigger>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      title={token ? "Token configured" : "Add GitHub token"}
+                    >
+                      <KeyRound className={`h-4 w-4 ${token ? "text-green-500" : ""}`} />
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
               </div>
               <CollapsibleContent>
                 <div className="mt-4 border-t pt-4">
@@ -358,19 +366,19 @@ function App() {
         {/* Results */}
         {result && (
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <FolderTree className="h-5 w-5" />
-                    {result.tree.name}
+            <CardHeader className="space-y-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <CardTitle className="flex flex-wrap items-center gap-2 text-base sm:text-lg">
+                    <FolderTree className="h-5 w-5 shrink-0" />
+                    <span className="truncate">{result.tree.name}</span>
                     {result.ref && (
-                      <Badge variant="outline" className="ml-2 font-mono text-xs">
+                      <Badge variant="outline" className="font-mono text-xs">
                         {result.ref}
                       </Badge>
                     )}
                   </CardTitle>
-                  <CardDescription className="flex items-center gap-2">
+                  <CardDescription className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                     {cacheInfo.isCached && cacheInfo.cachedAt ? (
                       <>
                         <span className="text-muted-foreground">
@@ -383,14 +391,16 @@ function App() {
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <BranchSelector
-                    branches={branches}
-                    tags={tags}
-                    selectedRef={selectedRef}
-                    defaultBranch={defaultBranch}
-                    onSelect={handleBranchChange}
-                    disabled={isAnalyzing}
-                  />
+                  <div className="min-w-0 flex-1 sm:flex-none">
+                    <BranchSelector
+                      branches={branches}
+                      tags={tags}
+                      selectedRef={selectedRef}
+                      defaultBranch={defaultBranch}
+                      onSelect={handleBranchChange}
+                      disabled={isAnalyzing}
+                    />
+                  </div>
                   {cacheInfo.isCached && (
                     <Button
                       variant="outline"
@@ -419,18 +429,18 @@ function App() {
                   )}
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 pt-2">
-                <Badge variant="secondary" className="gap-1">
+              <div className="flex flex-wrap gap-1.5 pt-2 sm:gap-2">
+                <Badge variant="secondary" className="gap-1 text-xs">
                   <File className="h-3 w-3" />
                   {result.stats.totalFiles} files
                 </Badge>
-                <Badge variant="secondary" className="gap-1">
+                <Badge variant="secondary" className="gap-1 text-xs">
                   <Folder className="h-3 w-3" />
-                  {result.stats.totalDirectories} directories
+                  {result.stats.totalDirectories} dirs
                 </Badge>
-                <Badge variant="secondary" className="gap-1">
+                <Badge variant="secondary" className="gap-1 text-xs">
                   <FileType className="h-3 w-3" />
-                  {Object.keys(result.stats.extensionCounts).length} file types
+                  {Object.keys(result.stats.extensionCounts).length} types
                 </Badge>
               </div>
               {result.truncated && (
@@ -452,21 +462,21 @@ function App() {
             <CardContent>
               <Tabs defaultValue="tree">
                 <TabsList>
-                  <TabsTrigger value="tree" className="gap-2">
+                  <TabsTrigger value="tree" className="gap-1.5 px-2.5 sm:gap-2 sm:px-4">
                     <FolderTree className="h-4 w-4" />
-                    Tree
+                    <span className="hidden sm:inline">Tree</span>
                   </TabsTrigger>
-                  <TabsTrigger value="stats" className="gap-2">
+                  <TabsTrigger value="stats" className="gap-1.5 px-2.5 sm:gap-2 sm:px-4">
                     <BarChart3 className="h-4 w-4" />
-                    Stats
+                    <span className="hidden sm:inline">Stats</span>
                   </TabsTrigger>
-                  <TabsTrigger value="size" className="gap-2">
+                  <TabsTrigger value="size" className="gap-1.5 px-2.5 sm:gap-2 sm:px-4">
                     <HardDrive className="h-4 w-4" />
-                    Size
+                    <span className="hidden sm:inline">Size</span>
                   </TabsTrigger>
-                  <TabsTrigger value="deps" className="gap-2">
+                  <TabsTrigger value="deps" className="gap-1.5 px-2.5 sm:gap-2 sm:px-4">
                     <Package className="h-4 w-4" />
-                    Deps
+                    <span className="hidden sm:inline">Deps</span>
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="tree">
@@ -481,7 +491,7 @@ function App() {
                       />
                     </div>
                   )}
-                  <div className="mb-4 flex items-center gap-4">
+                  <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                     <div className="flex-1">
                       <FileTreeSearch
                         ref={treeSearchRef}
@@ -493,7 +503,7 @@ function App() {
                     </div>
                     <CopyTreeButton tree={result.tree} />
                   </div>
-                  <div className="-mx-2 max-h-[500px] overflow-y-auto px-2">
+                  <div className="-mx-2 max-h-[60vh] overflow-y-auto px-2 sm:max-h-125">
                     <FileTree
                       node={result.tree}
                       filter={treeFilter}
@@ -520,9 +530,9 @@ function App() {
         )}
 
         {/* Footer */}
-        <div className="mt-12 flex flex-col items-center gap-2">
+        <div className="mt-8 flex flex-col items-center gap-2 sm:mt-12">
           <RateLimitIndicator rateLimit={rateLimit} isLoading={isLoadingRateLimit} />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground">
             Uses the GitHub API to analyze repositories
           </p>
         </div>
