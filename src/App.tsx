@@ -289,8 +289,8 @@ function App() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="tree">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex-1 mr-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex-1">
                       <FileTreeSearch
                         value={treeFilter}
                         onChange={setTreeFilter}
