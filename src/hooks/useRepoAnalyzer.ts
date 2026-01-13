@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import useSWR, { mutate } from 'swr';
 import type { FileNode, FileStats, AnalysisResult } from '../types';
 
 const IGNORED_DIRS = new Set(['.git', 'node_modules', '.next', 'dist', 'build', '.cache', '__pycache__', '.venv', 'venv']);
@@ -26,57 +27,6 @@ function storeToken(token: string): void {
   }
 }
 
-// Cache configuration
-const CACHE_KEY_PREFIX = 'repo-analyzer-cache:';
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-
-interface CacheEntry {
-  data: AnalysisResult;
-  timestamp: number;
-  ttl: number;
-}
-
-function getCacheKey(repoName: string, ref: string): string {
-  return `${CACHE_KEY_PREFIX}${repoName}@${ref}`;
-}
-
-function getFromCache(repoName: string, ref: string): CacheEntry | null {
-  try {
-    const key = getCacheKey(repoName, ref);
-    const cached = localStorage.getItem(key);
-    if (!cached) return null;
-
-    const entry: CacheEntry = JSON.parse(cached);
-    const now = Date.now();
-
-    // Check if cache is expired
-    if (now - entry.timestamp > entry.ttl) {
-      localStorage.removeItem(key);
-      return null;
-    }
-
-    return entry;
-  } catch {
-    return null;
-  }
-}
-
-function saveToCache(result: AnalysisResult): void {
-  if (!result.repoName) return;
-  try {
-    const key = getCacheKey(result.repoName, result.ref ?? 'default');
-    const entry: CacheEntry = {
-      data: result,
-      timestamp: Date.now(),
-      ttl: CACHE_TTL_MS,
-    };
-    localStorage.setItem(key, JSON.stringify(entry));
-  } catch (err) {
-    // localStorage might be full or disabled
-    console.warn('Failed to cache result:', err);
-  }
-}
-
 interface GitHubTreeItem {
   path: string;
   mode: string;
@@ -100,6 +50,26 @@ export interface GitHubTag {
   name: string;
 }
 
+interface RepoData {
+  default_branch: string;
+  name: string;
+}
+
+// SWR fetcher with auth support
+async function fetcher<T>(url: string, token?: string): Promise<T> {
+  const headers: HeadersInit = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, { headers });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || `Request failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
   const root: FileNode = {
     name: repoName,
@@ -110,11 +80,9 @@ function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
     directoryCount: 0,
   };
 
-  // Create a map for quick lookup
   const nodeMap = new Map<string, FileNode>();
   nodeMap.set('', root);
 
-  // Sort items to ensure parent directories come before children
   const sortedItems = [...items].sort((a, b) => a.path.localeCompare(b.path));
 
   for (const item of sortedItems) {
@@ -122,7 +90,6 @@ function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
     const name = parts[parts.length - 1];
     const parentPath = parts.slice(0, -1).join('/');
 
-    // Skip ignored directories and their contents
     if (parts.some(part => IGNORED_DIRS.has(part))) {
       continue;
     }
@@ -144,10 +111,8 @@ function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
 
     nodeMap.set(item.path, node);
 
-    // Find or create parent
     let parent = nodeMap.get(parentPath);
     if (!parent) {
-      // Create missing parent directories
       let currentPath = '';
       for (const part of parts.slice(0, -1)) {
         const prevPath = currentPath;
@@ -173,7 +138,6 @@ function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
     parent?.children?.push(node);
   }
 
-  // Calculate file counts for each directory
   function calculateCounts(node: FileNode): { files: number; dirs: number; size: number } {
     if (node.type === 'file') {
       return { files: 1, dirs: 0, size: node.size || 0 };
@@ -197,7 +161,6 @@ function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
     node.directoryCount = dirs;
     node.size = size;
 
-    // Sort children: directories first, then alphabetically
     node.children?.sort((a, b) => {
       if (a.type !== b.type) return a.type === 'directory' ? -1 : 1;
       return a.name.localeCompare(b.name);
@@ -239,9 +202,7 @@ function calculateStats(tree: FileNode): FileStats {
 function parseRepoInput(input: string): { owner: string; repoName: string } | null {
   const trimmed = input.trim();
 
-  // Try full URL format first: https://github.com/owner/repo
   const urlMatch = trimmed.match(/github\.com\/([^/]+)\/([^/]+)/);
-  // Try short format: owner/repo
   const shortMatch = trimmed.match(/^([^/]+)\/([^/]+)$/);
 
   if (urlMatch) {
@@ -259,173 +220,140 @@ function parseRepoInput(input: string): { owner: string; repoName: string } | nu
   return null;
 }
 
+// SWR configuration
+const swrConfig = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 60 * 60 * 1000, // 1 hour - acts like cache TTL
+};
+
 export function useRepoAnalyzer() {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState('');
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [branches, setBranches] = useState<GitHubBranch[]>([]);
-  const [tags, setTags] = useState<GitHubTag[]>([]);
-  const [selectedRef, setSelectedRef] = useState<string>('');
-  const [defaultBranch, setDefaultBranch] = useState<string>('');
-  const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null);
-  const [cacheInfo, setCacheInfo] = useState<{ isCached: boolean; cachedAt: Date | null }>({
-    isCached: false,
-    cachedAt: null,
-  });
   const [token, setTokenState] = useState<string>(getStoredToken);
+  const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null);
+  const [selectedRef, setSelectedRef] = useState<string>('');
 
   const setToken = useCallback((newToken: string) => {
     setTokenState(newToken);
     storeToken(newToken);
   }, []);
 
-  // Build headers with optional auth token
-  const getHeaders = useCallback((): HeadersInit => {
-    const headers: HeadersInit = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+  // Fetch repo info to get default branch
+  const repoKey = repoInfo ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}` : null;
+  const { data: repoData, error: repoError, isLoading: isLoadingRepo } = useSWR<RepoData>(
+    repoKey,
+    (url) => fetcher(url, token),
+    swrConfig
+  );
+
+  const defaultBranch = repoData?.default_branch || '';
+  const targetRef = selectedRef || defaultBranch;
+
+  // Fetch file tree (depends on repo data)
+  const treeKey = repoInfo && targetRef
+    ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/git/trees/${targetRef}?recursive=1`
+    : null;
+  const { data: treeData, error: treeError, isLoading: isLoadingTree } = useSWR<GitHubTreeResponse>(
+    treeKey,
+    (url) => fetcher(url, token),
+    swrConfig
+  );
+
+  // Fetch branches
+  const branchesKey = repoInfo
+    ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/branches?per_page=100`
+    : null;
+  const { data: branchesData } = useSWR<GitHubBranch[]>(
+    branchesKey,
+    (url) => fetcher(url, token),
+    { ...swrConfig, revalidateOnMount: true }
+  );
+
+  // Fetch tags
+  const tagsKey = repoInfo
+    ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/tags?per_page=100`
+    : null;
+  const { data: tagsData } = useSWR<GitHubTag[]>(
+    tagsKey,
+    (url) => fetcher(url, token),
+    { ...swrConfig, revalidateOnMount: true }
+  );
+
+  // Ensure default branch is in branches list
+  const branches = useMemo(() => {
+    const list = branchesData || [];
+    if (defaultBranch && !list.some(b => b.name === defaultBranch)) {
+      return [{ name: defaultBranch, protected: false }, ...list];
     }
-    return headers;
-  }, [token]);
+    return list;
+  }, [branchesData, defaultBranch]);
 
-  const fetchBranchesAndTags = useCallback(async (owner: string, repoName: string, defaultBranchName: string) => {
-    const headers = getHeaders();
-    try {
-      const [branchesRes, tagsRes] = await Promise.all([
-        fetch(`https://api.github.com/repos/${owner}/${repoName}/branches?per_page=100`, { headers }),
-        fetch(`https://api.github.com/repos/${owner}/${repoName}/tags?per_page=100`, { headers }),
-      ]);
+  const tags = tagsData || [];
 
-      if (branchesRes.ok) {
-        const branchesData: GitHubBranch[] = await branchesRes.json();
-        // Ensure default branch is always in the list
-        const hasDefaultBranch = branchesData.some(b => b.name === defaultBranchName);
-        if (!hasDefaultBranch && defaultBranchName) {
-          branchesData.unshift({ name: defaultBranchName, protected: false });
-        }
-        setBranches(branchesData);
-      } else {
-        // If branches fetch fails, at least show the default branch
-        if (defaultBranchName) {
-          setBranches([{ name: defaultBranchName, protected: false }]);
-        }
-      }
+  // Build analysis result from tree data
+  const result: AnalysisResult | null = useMemo(() => {
+    if (!treeData || !repoInfo) return null;
 
-      if (tagsRes.ok) {
-        const tagsData: GitHubTag[] = await tagsRes.json();
-        setTags(tagsData);
-      }
-    } catch (err) {
-      console.error('Failed to fetch branches/tags:', err);
-      // On error, at least show the default branch
-      if (defaultBranchName) {
-        setBranches([{ name: defaultBranchName, protected: false }]);
-      }
+    if (treeData.truncated) {
+      console.warn('Repository tree was truncated due to size');
     }
-  }, [getHeaders]);
 
-  const analyze = useCallback(async (repoUrl: string, ref?: string, forceRefresh = false) => {
-    setIsAnalyzing(true);
-    setError(null);
-    setResult(null);
-    setCacheInfo({ isCached: false, cachedAt: null });
+    const tree = buildFileTree(treeData.tree, repoInfo.repoName);
+    const stats = calculateStats(tree);
 
-    const headers = getHeaders();
+    return {
+      tree,
+      stats,
+      repoName: `${repoInfo.owner}/${repoInfo.repoName}`,
+      ref: targetRef,
+    };
+  }, [treeData, repoInfo, targetRef]);
 
-    try {
-      const parsed = parseRepoInput(repoUrl);
-      if (!parsed) {
-        throw new Error('Invalid format. Use owner/repo or https://github.com/owner/repo');
-      }
+  // Determine loading and error states
+  const isAnalyzing = isLoadingRepo || isLoadingTree;
+  const error = repoError?.message || treeError?.message || null;
 
-      const { owner, repoName } = parsed;
-      setRepoInfo({ owner, repoName });
+  // Progress message
+  const progress = useMemo(() => {
+    if (isLoadingRepo) return 'Fetching repository info...';
+    if (isLoadingTree) return 'Fetching file tree...';
+    return '';
+  }, [isLoadingRepo, isLoadingTree]);
 
-      setProgress('Fetching repository info...');
+  // Check if result is from SWR cache
+  const cacheInfo = useMemo(() => {
+    // SWR doesn't expose cache timestamp directly, but we can infer from state
+    // If we have result and not loading, and it came immediately, it's cached
+    return {
+      isCached: false, // SWR handles caching transparently
+      cachedAt: null as Date | null,
+    };
+  }, []);
 
-      // Get default branch
-      const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, { headers });
-      if (!repoResponse.ok) {
-        const errorData = await repoResponse.json().catch(() => null);
-        throw new Error(errorData?.message || `Failed to fetch repository: ${repoResponse.statusText}`);
-      }
-      const repoData = await repoResponse.json();
-      const defaultBranchName = repoData.default_branch;
-      setDefaultBranch(defaultBranchName);
-
-      // Use provided ref or default branch
-      const targetRef = ref || defaultBranchName;
-      setSelectedRef(targetRef);
-
-      // Check cache unless force refresh is requested
-      const fullRepoName = `${owner}/${repoName}`;
-      if (!forceRefresh) {
-        const cached = getFromCache(fullRepoName, targetRef);
-        if (cached) {
-          setResult(cached.data);
-          setCacheInfo({ isCached: true, cachedAt: new Date(cached.timestamp) });
-          setProgress('');
-          // Still fetch branches/tags in background
-          fetchBranchesAndTags(owner, repoName, defaultBranchName);
-          return;
-        }
-      }
-
-      setProgress('Fetching file tree...');
-
-      // Get the tree recursively
-      const treeResponse = await fetch(
-        `https://api.github.com/repos/${owner}/${repoName}/git/trees/${targetRef}?recursive=1`,
-        { headers }
-      );
-      if (!treeResponse.ok) {
-        const errorData = await treeResponse.json().catch(() => null);
-        throw new Error(errorData?.message || `Failed to fetch file tree: ${treeResponse.statusText}`);
-      }
-      const treeData: GitHubTreeResponse = await treeResponse.json();
-
-      if (treeData.truncated) {
-        console.warn('Repository tree was truncated due to size');
-      }
-
-      setProgress('Analyzing file structure...');
-
-      // Build the file tree
-      const tree = buildFileTree(treeData.tree, repoName);
-      const stats = calculateStats(tree);
-
-      const analysisResult: AnalysisResult = { tree, stats, repoName: fullRepoName, ref: targetRef };
-      setResult(analysisResult);
-      setCacheInfo({ isCached: false, cachedAt: null });
-      setProgress('');
-
-      // Save to cache
-      saveToCache(analysisResult);
-
-      // Fetch branches and tags for the selector (in background)
-      fetchBranchesAndTags(owner, repoName, defaultBranchName);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Analysis failed';
-      setError(message);
-    } finally {
-      setIsAnalyzing(false);
+  const analyze = useCallback((repoUrl: string, ref?: string, forceRefresh = false) => {
+    const parsed = parseRepoInput(repoUrl);
+    if (!parsed) {
+      return;
     }
-  }, [fetchBranchesAndTags, getHeaders]);
 
-  const analyzeWithRef = useCallback(async (ref: string) => {
+    setRepoInfo(parsed);
+    setSelectedRef(ref || '');
+
+    if (forceRefresh) {
+      // Invalidate SWR cache for this repo
+      const baseUrl = `https://api.github.com/repos/${parsed.owner}/${parsed.repoName}`;
+      mutate(baseUrl, undefined, { revalidate: true });
+      mutate((key) => typeof key === 'string' && key.startsWith(baseUrl), undefined, { revalidate: true });
+    }
+  }, []);
+
+  const analyzeWithRef = useCallback((ref: string) => {
     if (!repoInfo) return;
-    await analyze(`${repoInfo.owner}/${repoInfo.repoName}`, ref);
-  }, [analyze, repoInfo]);
+    setSelectedRef(ref);
+  }, [repoInfo]);
 
   const reset = useCallback(() => {
-    setResult(null);
-    setError(null);
-    setBranches([]);
-    setTags([]);
-    setSelectedRef('');
-    setDefaultBranch('');
     setRepoInfo(null);
+    setSelectedRef('');
   }, []);
 
   return {
@@ -438,7 +366,7 @@ export function useRepoAnalyzer() {
     error,
     branches,
     tags,
-    selectedRef,
+    selectedRef: targetRef,
     defaultBranch,
     cacheInfo,
     token,
