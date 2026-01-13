@@ -306,10 +306,8 @@ export function useRepoAnalyzer() {
       // Get default branch
       const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`);
       if (!repoResponse.ok) {
-        if (repoResponse.status === 404) {
-          throw new Error('Repository not found. Make sure it exists and is public.');
-        }
-        throw new Error(`Failed to fetch repository: ${repoResponse.statusText}`);
+        const errorData = await repoResponse.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to fetch repository: ${repoResponse.statusText}`);
       }
       const repoData = await repoResponse.json();
       const defaultBranchName = repoData.default_branch;
@@ -340,7 +338,8 @@ export function useRepoAnalyzer() {
         `https://api.github.com/repos/${owner}/${repoName}/git/trees/${targetRef}?recursive=1`
       );
       if (!treeResponse.ok) {
-        throw new Error(`Failed to fetch file tree: ${treeResponse.statusText}`);
+        const errorData = await treeResponse.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to fetch file tree: ${treeResponse.statusText}`);
       }
       const treeData: GitHubTreeResponse = await treeResponse.json();
 
