@@ -22,4 +22,6 @@ export interface AnalysisResult {
   stats: FileStats
   repoName?: string
   ref?: string
+  truncated?: boolean
+  currentPath?: string
 }

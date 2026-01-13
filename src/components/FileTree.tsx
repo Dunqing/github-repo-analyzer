@@ -12,6 +12,7 @@ interface FileTreeProps {
   level?: number
   filter?: string
   forceOpen?: boolean
+  onFolderNavigate?: (path: string) => void
 }
 
 function filterTree(node: FileNode, filter: string): FileNode | null {
@@ -72,7 +73,13 @@ function HighlightMatch({ text, filter }: { text: string; filter: string }) {
   )
 }
 
-function FileTreeNode({ node, level = 0, filter = "", forceOpen = false }: FileTreeProps) {
+function FileTreeNode({
+  node,
+  level = 0,
+  filter = "",
+  forceOpen = false,
+  onFolderNavigate,
+}: FileTreeProps) {
   const [isOpen, setIsOpen] = useState(level < 2 || forceOpen)
 
   // When filter is active and node matches, expand it
@@ -99,6 +106,14 @@ function FileTreeNode({ node, level = 0, filter = "", forceOpen = false }: FileT
     )
   }
 
+  const handleFolderDoubleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (onFolderNavigate && node.path) {
+      onFolderNavigate(node.path)
+    }
+  }
+
   return (
     <Collapsible open={shouldBeOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
@@ -106,8 +121,11 @@ function FileTreeNode({ node, level = 0, filter = "", forceOpen = false }: FileT
           className={cn(
             "flex w-full items-center gap-2 rounded px-2 py-1 text-sm",
             "hover:bg-muted/50 text-left transition-colors",
+            onFolderNavigate && "group",
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
+          onDoubleClick={handleFolderDoubleClick}
+          title={onFolderNavigate ? "Click to expand, double-click to navigate" : undefined}
         >
           <ChevronRight
             className={cn(
@@ -134,6 +152,7 @@ function FileTreeNode({ node, level = 0, filter = "", forceOpen = false }: FileT
               level={level + 1}
               filter={filter}
               forceOpen={!!filter}
+              onFolderNavigate={onFolderNavigate}
             />
           ))}
         </div>
@@ -142,7 +161,7 @@ function FileTreeNode({ node, level = 0, filter = "", forceOpen = false }: FileT
   )
 }
 
-export function FileTree({ node, level = 0, filter = "" }: FileTreeProps) {
+export function FileTree({ node, level = 0, filter = "", onFolderNavigate }: FileTreeProps) {
   const filteredNode = useMemo(() => filterTree(node, filter), [node, filter])
 
   if (!filteredNode) {
@@ -153,7 +172,15 @@ export function FileTree({ node, level = 0, filter = "" }: FileTreeProps) {
     )
   }
 
-  return <FileTreeNode node={filteredNode} level={level} filter={filter} forceOpen={!!filter} />
+  return (
+    <FileTreeNode
+      node={filteredNode}
+      level={level}
+      filter={filter}
+      forceOpen={!!filter}
+      onFolderNavigate={onFolderNavigate}
+    />
+  )
 }
 
 export { countMatchingFiles }

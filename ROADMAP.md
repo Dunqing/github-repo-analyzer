@@ -384,10 +384,12 @@ Better handling of repositories with truncated trees.
 ### Phase 2: Visualizations
 
 - [x] 2.1 Pie/Donut Chart
+- [x] 2.3 Lines of Code Estimate
 
 ### Phase 5: Performance
 
 - [x] 5.1 Result Caching
+- [x] 5.2 Large Repo Handling (with folder navigation)
 
 ### Foundation
 

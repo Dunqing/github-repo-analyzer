@@ -1,0 +1,78 @@
+import { ChevronRight, FolderOpen, Home, Loader2 } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+
+interface PathBreadcrumbProps {
+  repoName: string
+  currentPath: string
+  onNavigateToRoot: () => void
+  onNavigateToPath: (path: string) => void
+  isLoading?: boolean
+}
+
+export function PathBreadcrumb({
+  repoName,
+  currentPath,
+  onNavigateToRoot,
+  onNavigateToPath,
+  isLoading = false,
+}: PathBreadcrumbProps) {
+  const parts = currentPath ? currentPath.split("/") : []
+  const repoShortName = repoName.split("/")[1]
+  const isAtRoot = !currentPath
+
+  return (
+    <div
+      className="bg-muted/50 flex items-center gap-1 overflow-x-auto rounded-md border px-2 py-1.5 text-sm"
+      title="Double-click on folders below to navigate into them"
+    >
+      {isLoading ? (
+        <Loader2 className="text-muted-foreground mr-1 h-4 w-4 shrink-0 animate-spin" />
+      ) : (
+        <FolderOpen className="text-muted-foreground mr-1 h-4 w-4 shrink-0" />
+      )}
+      {isAtRoot ? (
+        <div className="flex h-6 shrink-0 items-center gap-1 px-1">
+          <Home className="h-3.5 w-3.5" />
+          <span className="font-mono text-xs font-medium">{repoShortName}</span>
+        </div>
+      ) : (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 shrink-0 gap-1 px-1"
+          onClick={onNavigateToRoot}
+        >
+          <Home className="h-3.5 w-3.5" />
+          <span className="font-mono text-xs">{repoShortName}</span>
+        </Button>
+      )}
+      {parts.map((part, index) => {
+        const pathToHere = parts.slice(0, index + 1).join("/")
+        const isLast = index === parts.length - 1
+        return (
+          <div key={pathToHere} className="flex shrink-0 items-center gap-1">
+            <ChevronRight className="text-muted-foreground h-3.5 w-3.5" />
+            {isLast ? (
+              <span className="font-mono text-xs font-medium">{part}</span>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-1"
+                onClick={() => onNavigateToPath(pathToHere)}
+              >
+                <span className="font-mono text-xs">{part}</span>
+              </Button>
+            )}
+          </div>
+        )
+      })}
+      {isAtRoot && (
+        <span className="text-muted-foreground ml-auto text-[10px] italic">
+          Double-click folders to navigate
+        </span>
+      )}
+    </div>
+  )
+}

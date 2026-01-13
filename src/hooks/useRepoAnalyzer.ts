@@ -243,6 +243,7 @@ export function useRepoAnalyzer() {
   const [token, setTokenState] = useState<string>(getStoredToken)
   const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null)
   const [selectedRef, setSelectedRef] = useState<string>("")
+  const [currentPath, setCurrentPath] = useState<string>("")
 
   const setToken = useCallback((newToken: string) => {
     setTokenState(newToken)
@@ -263,15 +264,24 @@ export function useRepoAnalyzer() {
   const targetRef = selectedRef || defaultBranch
 
   // Fetch file tree (depends on repo data)
-  const treeKey =
-    repoInfo && targetRef
-      ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/git/trees/${targetRef}?recursive=1`
-      : null
+  // When currentPath is set, fetch that specific subtree
+  const treeKey = useMemo(() => {
+    if (!repoInfo || !targetRef) return null
+    if (currentPath) {
+      // Fetch specific subtree by path
+      return `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/git/trees/${targetRef}:${currentPath}?recursive=1`
+    }
+    return `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/git/trees/${targetRef}?recursive=1`
+  }, [repoInfo, targetRef, currentPath])
+
   const {
     data: treeData,
     error: treeError,
     isLoading: isLoadingTree,
-  } = useSWR<GitHubTreeResponse>(treeKey, (url) => fetcher(url, token), swrConfig)
+  } = useSWR<GitHubTreeResponse>(treeKey, (url) => fetcher(url, token), {
+    ...swrConfig,
+    keepPreviousData: true, // Keep showing old tree while fetching new subtree
+  })
 
   // Fetch branches
   const branchesKey = repoInfo
@@ -310,7 +320,11 @@ export function useRepoAnalyzer() {
       console.warn("Repository tree was truncated due to size")
     }
 
-    const tree = buildFileTree(treeData.tree, repoInfo.repoName)
+    // Get the display name for the root (either repo name or current folder name)
+    const rootName = currentPath
+      ? currentPath.split("/").pop() || repoInfo.repoName
+      : repoInfo.repoName
+    const tree = buildFileTree(treeData.tree, rootName)
     const stats = calculateStats(tree)
 
     return {
@@ -318,11 +332,17 @@ export function useRepoAnalyzer() {
       stats,
       repoName: `${repoInfo.owner}/${repoInfo.repoName}`,
       ref: targetRef,
+      truncated: treeData.truncated,
+      currentPath,
     }
-  }, [treeData, repoInfo, targetRef])
+  }, [treeData, repoInfo, targetRef, currentPath])
 
   // Determine loading and error states
-  const isAnalyzing = isLoadingRepo || isLoadingTree
+  // isAnalyzing: true only for initial load (no data yet)
+  // isNavigating: true when switching paths but we have previous data
+  const hasData = !!treeData
+  const isAnalyzing = isLoadingRepo || (isLoadingTree && !hasData)
+  const isNavigating = isLoadingTree && hasData
   const error = repoError?.message || treeError?.message || null
 
   // Progress message
@@ -350,6 +370,7 @@ export function useRepoAnalyzer() {
 
     setRepoInfo(parsed)
     setSelectedRef(ref || "")
+    setCurrentPath("") // Reset path when analyzing new repo
 
     if (forceRefresh) {
       // Invalidate SWR cache for this repo
@@ -365,6 +386,7 @@ export function useRepoAnalyzer() {
     (ref: string) => {
       if (!repoInfo) return
       setSelectedRef(ref)
+      setCurrentPath("") // Reset path when changing branch
     },
     [repoInfo],
   )
@@ -372,6 +394,25 @@ export function useRepoAnalyzer() {
   const reset = useCallback(() => {
     setRepoInfo(null)
     setSelectedRef("")
+    setCurrentPath("")
+  }, [])
+
+  // Navigate into a subdirectory
+  const navigateToPath = useCallback((path: string) => {
+    setCurrentPath(path)
+  }, [])
+
+  // Navigate up one level
+  const navigateUp = useCallback(() => {
+    if (!currentPath) return
+    const parts = currentPath.split("/")
+    parts.pop()
+    setCurrentPath(parts.join("/"))
+  }, [currentPath])
+
+  // Navigate to root
+  const navigateToRoot = useCallback(() => {
+    setCurrentPath("")
   }, [])
 
   return {
@@ -379,6 +420,7 @@ export function useRepoAnalyzer() {
     analyzeWithRef,
     reset,
     isAnalyzing,
+    isNavigating,
     progress,
     result,
     error,
@@ -389,5 +431,9 @@ export function useRepoAnalyzer() {
     cacheInfo,
     token,
     setToken,
+    currentPath,
+    navigateToPath,
+    navigateUp,
+    navigateToRoot,
   }
 }

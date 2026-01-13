@@ -10,6 +10,7 @@ import {
   HardDrive,
   RefreshCw,
   KeyRound,
+  AlertTriangle,
 } from "lucide-react"
 import { useState, useCallback, useEffect } from "react"
 
@@ -19,6 +20,7 @@ import { FileSizeStats } from "@/components/FileSizeStats"
 import { FileStats } from "@/components/FileStats"
 import { FileTree, countMatchingFiles } from "@/components/FileTree"
 import { FileTreeSearch } from "@/components/FileTreeSearch"
+import { PathBreadcrumb } from "@/components/PathBreadcrumb"
 import { ShareButton } from "@/components/ShareButton"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +40,7 @@ function App() {
     analyze,
     analyzeWithRef,
     isAnalyzing,
+    isNavigating,
     progress,
     result,
     error,
@@ -48,7 +51,24 @@ function App() {
     cacheInfo,
     token,
     setToken,
+    currentPath,
+    navigateToPath,
+    navigateToRoot,
   } = useRepoAnalyzer()
+
+  // Wrap navigation to also reset filter
+  const handleNavigateToPath = useCallback(
+    (path: string) => {
+      setTreeFilter("")
+      navigateToPath(path)
+    },
+    [navigateToPath],
+  )
+
+  const handleNavigateToRoot = useCallback(() => {
+    setTreeFilter("")
+    navigateToRoot()
+  }, [navigateToRoot])
   const [showSettings, setShowSettings] = useState(false)
 
   // Handle URL parameters on mount
@@ -56,14 +76,31 @@ function App() {
     const params = new URLSearchParams(window.location.search)
     const repoParam = params.get("repo")
     const branchParam = params.get("branch")
+    const pathParam = params.get("path")
 
     if (repoParam) {
       setRepoUrl(repoParam)
       analyze(repoParam, branchParam || undefined)
+      // Navigate to path after a short delay to let the initial fetch complete
+      if (pathParam) {
+        // Store in sessionStorage to apply after result loads
+        sessionStorage.setItem("pending-path", pathParam)
+      }
     }
   }, [analyze])
 
-  // Update URL when analysis completes
+  // Apply pending path from URL after result loads
+  useEffect(() => {
+    if (result && !isAnalyzing) {
+      const pendingPath = sessionStorage.getItem("pending-path")
+      if (pendingPath) {
+        sessionStorage.removeItem("pending-path")
+        navigateToPath(pendingPath)
+      }
+    }
+  }, [result, isAnalyzing, navigateToPath])
+
+  // Update URL when analysis completes or path changes
   useEffect(() => {
     if (result?.repoName) {
       const url = new URL(window.location.href)
@@ -71,9 +108,14 @@ function App() {
       if (result.ref) {
         url.searchParams.set("branch", result.ref)
       }
+      if (currentPath) {
+        url.searchParams.set("path", currentPath)
+      } else {
+        url.searchParams.delete("path")
+      }
       window.history.replaceState({}, "", url.toString())
     }
-  }, [result])
+  }, [result, currentPath])
 
   const handleAnalyze = useCallback(() => {
     if (!repoUrl.trim()) return
@@ -263,7 +305,11 @@ function App() {
                     </Button>
                   )}
                   {result.repoName && (
-                    <ShareButton repoName={result.repoName} branch={result.ref} />
+                    <ShareButton
+                      repoName={result.repoName}
+                      branch={result.ref}
+                      path={currentPath}
+                    />
                   )}
                 </div>
               </div>
@@ -281,6 +327,20 @@ function App() {
                   {Object.keys(result.stats.extensionCounts).length} file types
                 </Badge>
               </div>
+              {result.truncated && (
+                <div className="mt-3 flex items-start gap-2 rounded-md border border-yellow-500/50 bg-yellow-500/10 p-3 text-sm">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-500" />
+                  <div>
+                    <p className="font-medium text-yellow-700 dark:text-yellow-400">
+                      Large repository - tree truncated
+                    </p>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      GitHub limits tree responses to ~100k entries. Double-click on folders to
+                      navigate into subdirectories and see their full contents.
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardHeader>
             <Separator />
             <CardContent className="pt-6">
@@ -300,6 +360,17 @@ function App() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="tree">
+                  {result.repoName && (
+                    <div className="mb-4">
+                      <PathBreadcrumb
+                        repoName={result.repoName}
+                        currentPath={currentPath}
+                        onNavigateToRoot={handleNavigateToRoot}
+                        onNavigateToPath={handleNavigateToPath}
+                        isLoading={isNavigating}
+                      />
+                    </div>
+                  )}
                   <div className="mb-4 flex items-center gap-4">
                     <div className="flex-1">
                       <FileTreeSearch
@@ -312,7 +383,11 @@ function App() {
                     <CopyTreeButton tree={result.tree} />
                   </div>
                   <div className="-mx-2 max-h-[500px] overflow-y-auto px-2">
-                    <FileTree node={result.tree} filter={treeFilter} />
+                    <FileTree
+                      node={result.tree}
+                      filter={treeFilter}
+                      onFolderNavigate={handleNavigateToPath}
+                    />
                   </div>
                 </TabsContent>
                 <TabsContent value="stats">

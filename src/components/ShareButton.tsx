@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 interface ShareButtonProps {
   repoName: string
   branch?: string
+  path?: string
 }
 
-export function ShareButton({ repoName, branch }: ShareButtonProps) {
+export function ShareButton({ repoName, branch, path }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -16,6 +17,11 @@ export function ShareButton({ repoName, branch }: ShareButtonProps) {
     url.searchParams.set("repo", repoName)
     if (branch) {
       url.searchParams.set("branch", branch)
+    }
+    if (path) {
+      url.searchParams.set("path", path)
+    } else {
+      url.searchParams.delete("path")
     }
 
     try {
