@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react"
+import { mutate } from "swr"
 import AlertTriangle from "~icons/lucide/alert-triangle"
 import BarChart3 from "~icons/lucide/bar-chart-3"
 import File from "~icons/lucide/file"
@@ -312,13 +313,33 @@ function App() {
                   <div className="flex items-start gap-2">
                     <KeyRound className="mt-2.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <div className="flex-1 space-y-2">
-                      <Input
-                        type="password"
-                        placeholder="GitHub Personal Access Token"
-                        value={token}
-                        onChange={(e) => setToken(e.target.value)}
-                        className="font-mono text-sm"
-                      />
+                      <div className="relative">
+                        <Input
+                          type="password"
+                          placeholder="GitHub Personal Access Token"
+                          value={token}
+                          onChange={(e) => setToken(e.target.value)}
+                          className="pr-10 font-mono text-sm"
+                        />
+                        {token && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 p-0"
+                            onClick={() => {
+                              setToken("")
+                              // Re-fetch all GitHub API data with new auth state
+                              void mutate(
+                                (key) => typeof key === "string" && key.includes("api.github.com"),
+                                undefined,
+                                { revalidate: true },
+                              )
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         Optional: Add a token to access private repos or avoid rate limits. Token is
                         stored locally in your browser.
