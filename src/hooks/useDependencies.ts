@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import useSWR from "swr"
 
 import { DEPENDENCY_FILES, type DependencyInfo } from "@/lib/dependencyParser"
+import { githubFetcherSafe } from "@/lib/github-api"
 
 interface GitHubContentResponse {
   content: string
@@ -14,33 +15,14 @@ async function fetchFileContent(
   path: string,
   token?: string,
 ): Promise<string | null> {
-  const headers: Record<string, string> = {
-    Accept: "application/vnd.github.v3+json",
+  const url = `https://api.github.com/repos/${repoName}/contents/${path}?ref=${branch}`
+  const data = await githubFetcherSafe<GitHubContentResponse>(url, token)
+
+  if (data?.encoding === "base64" && data.content) {
+    return atob(data.content.replace(/\n/g, ""))
   }
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
 
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${repoName}/contents/${path}?ref=${branch}`,
-      { headers },
-    )
-
-    if (!response.ok) {
-      return null
-    }
-
-    const data: GitHubContentResponse = await response.json()
-
-    if (data.encoding === "base64" && data.content) {
-      return atob(data.content.replace(/\n/g, ""))
-    }
-
-    return null
-  } catch {
-    return null
-  }
+  return null
 }
 
 async function fetchDependencies(

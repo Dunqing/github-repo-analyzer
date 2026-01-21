@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react"
 import useSWR, { mutate } from "swr"
 
+import { githubFetcher, getStoredToken, storeToken, swrConfig } from "@/lib/github-api"
 import { getCacheTimestamp, clearCache } from "@/lib/swr-cache-provider"
 
 import type { FileNode, FileStats, AnalysisResult } from "../types"
@@ -16,29 +17,6 @@ const IGNORED_DIRS = new Set([
   ".venv",
   "venv",
 ])
-
-// Token storage
-const TOKEN_STORAGE_KEY = "repo-analyzer-token"
-
-function getStoredToken(): string {
-  try {
-    return localStorage.getItem(TOKEN_STORAGE_KEY) || ""
-  } catch {
-    return ""
-  }
-}
-
-function storeToken(token: string): void {
-  try {
-    if (token) {
-      localStorage.setItem(TOKEN_STORAGE_KEY, token)
-    } else {
-      localStorage.removeItem(TOKEN_STORAGE_KEY)
-    }
-  } catch {
-    // localStorage might be disabled
-  }
-}
 
 interface GitHubTreeItem {
   path: string
@@ -66,21 +44,6 @@ export interface GitHubTag {
 interface RepoData {
   default_branch: string
   name: string
-}
-
-// SWR fetcher with auth support
-async function fetcher<T>(url: string, token?: string): Promise<T> {
-  const headers: HeadersInit = {}
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`
-  }
-
-  const response = await fetch(url, { headers })
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null)
-    throw new Error(errorData?.message || `Request failed: ${response.statusText}`)
-  }
-  return response.json()
 }
 
 function buildFileTree(items: GitHubTreeItem[], repoName: string): FileNode {
@@ -234,13 +197,6 @@ function parseRepoInput(input: string): { owner: string; repoName: string } | nu
   return null
 }
 
-// SWR configuration
-const swrConfig = {
-  revalidateOnFocus: false,
-  revalidateOnReconnect: false,
-  dedupingInterval: 60 * 60 * 1000, // 1 hour - acts like cache TTL
-}
-
 export function useRepoAnalyzer() {
   const [token, setTokenState] = useState<string>(getStoredToken)
   const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null)
@@ -260,7 +216,7 @@ export function useRepoAnalyzer() {
     data: repoData,
     error: repoError,
     isLoading: isLoadingRepo,
-  } = useSWR<RepoData>(repoKey, (url) => fetcher(url, token), swrConfig)
+  } = useSWR<RepoData>(repoKey, (url) => githubFetcher(url, token), swrConfig)
 
   const defaultBranch = repoData?.default_branch || ""
   const targetRef = selectedRef || defaultBranch
@@ -280,7 +236,7 @@ export function useRepoAnalyzer() {
     data: treeData,
     error: treeError,
     isLoading: isLoadingTree,
-  } = useSWR<GitHubTreeResponse>(treeKey, (url) => fetcher(url, token), {
+  } = useSWR<GitHubTreeResponse>(treeKey, (url) => githubFetcher(url, token), {
     ...swrConfig,
     keepPreviousData: true, // Keep showing old tree while fetching new subtree
   })
@@ -289,16 +245,20 @@ export function useRepoAnalyzer() {
   const branchesKey = repoInfo
     ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/branches?per_page=100`
     : null
-  const { data: branchesData } = useSWR<GitHubBranch[]>(branchesKey, (url) => fetcher(url, token), {
-    ...swrConfig,
-    revalidateOnMount: true,
-  })
+  const { data: branchesData } = useSWR<GitHubBranch[]>(
+    branchesKey,
+    (url) => githubFetcher(url, token),
+    {
+      ...swrConfig,
+      revalidateOnMount: true,
+    },
+  )
 
   // Fetch tags
   const tagsKey = repoInfo
     ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/tags?per_page=100`
     : null
-  const { data: tagsData } = useSWR<GitHubTag[]>(tagsKey, (url) => fetcher(url, token), {
+  const { data: tagsData } = useSWR<GitHubTag[]>(tagsKey, (url) => githubFetcher(url, token), {
     ...swrConfig,
     revalidateOnMount: true,
   })
