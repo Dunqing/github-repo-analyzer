@@ -35,7 +35,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useDependencies } from "@/hooks/useDependencies"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
 import { useRateLimit } from "@/hooks/useRateLimit"
 import { useRecentRepos } from "@/hooks/useRecentRepos"
@@ -72,30 +71,6 @@ function App() {
 
   const { recent, addRecent, clearRecent } = useRecentRepos()
   const { rateLimit, isLoading: isLoadingRateLimit } = useRateLimit(token)
-
-  // Extract root-level file paths from tree for dependency checking
-  const rootFilePaths = useMemo(() => {
-    if (!result?.tree?.children) return undefined
-    const paths = new Set<string>()
-    for (const child of result.tree.children) {
-      if (child.type === "file") {
-        paths.add(child.name)
-      }
-    }
-    return paths
-  }, [result?.tree?.children])
-
-  const {
-    dependencies,
-    isLoading: isLoadingDeps,
-    error: depsError,
-  } = useDependencies({
-    repoName: result?.repoName || "",
-    branch: result?.ref || "",
-    token,
-    enabled: !!result?.repoName && !!result?.ref,
-    existingPaths: rootFilePaths,
-  })
 
   // Add to recent repos when analysis completes
   useEffect(() => {
@@ -535,9 +510,10 @@ function App() {
                 </TabsContent>
                 <TabsContent value="deps">
                   <DependencyStats
-                    dependencies={dependencies}
-                    isLoading={isLoadingDeps}
-                    error={depsError}
+                    repoName={result.repoName || ""}
+                    branch={result.ref || ""}
+                    token={token}
+                    tree={result.tree}
                   />
                 </TabsContent>
               </Tabs>

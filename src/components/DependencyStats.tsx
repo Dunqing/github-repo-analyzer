@@ -1,19 +1,21 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import AlertCircle from "~icons/lucide/alert-circle"
 import ChevronDown from "~icons/lucide/chevron-down"
 import ExternalLink from "~icons/lucide/external-link"
 import Loader2 from "~icons/lucide/loader-2"
 import Package from "~icons/lucide/package"
 
-import type { DependencyInfo } from "@/lib/dependencyParser"
+import type { FileNode } from "@/types"
 
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useDependencies } from "@/hooks/useDependencies"
 
 interface DependencyStatsProps {
-  dependencies: DependencyInfo[]
-  isLoading: boolean
-  error?: Error | null
+  repoName: string
+  branch: string
+  token?: string
+  tree?: FileNode
 }
 
 const ECOSYSTEM_LABELS: Record<string, string> = {
@@ -122,7 +124,27 @@ function DependencyList({
   )
 }
 
-export function DependencyStats({ dependencies, isLoading, error }: DependencyStatsProps) {
+export function DependencyStats({ repoName, branch, token, tree }: DependencyStatsProps) {
+  // Extract root-level file paths from tree for dependency checking
+  const existingPaths = useMemo(() => {
+    if (!tree?.children) return undefined
+    const paths = new Set<string>()
+    for (const child of tree.children) {
+      if (child.type === "file") {
+        paths.add(child.name)
+      }
+    }
+    return paths
+  }, [tree?.children])
+
+  const { dependencies, isLoading, error } = useDependencies({
+    repoName,
+    branch,
+    token,
+    enabled: !!repoName && !!branch,
+    existingPaths,
+  })
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
