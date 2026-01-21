@@ -248,20 +248,18 @@ export function useRepoAnalyzer() {
   const { data: branchesData } = useSWR<GitHubBranch[]>(
     branchesKey,
     (url) => githubFetcher(url, token),
-    {
-      ...swrConfig,
-      revalidateOnMount: true,
-    },
+    swrConfig,
   )
 
   // Fetch tags
   const tagsKey = repoInfo
     ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/tags?per_page=100`
     : null
-  const { data: tagsData } = useSWR<GitHubTag[]>(tagsKey, (url) => githubFetcher(url, token), {
-    ...swrConfig,
-    revalidateOnMount: true,
-  })
+  const { data: tagsData } = useSWR<GitHubTag[]>(
+    tagsKey,
+    (url) => githubFetcher(url, token),
+    swrConfig,
+  )
 
   // Ensure default branch is in branches list
   const branches = useMemo(() => {
