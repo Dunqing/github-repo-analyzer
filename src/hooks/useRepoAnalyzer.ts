@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react"
-import useSWR, { mutate } from "swr"
+import useSWR from "swr"
 
 import { githubFetcher, getStoredToken, storeToken, swrConfig } from "@/lib/github-api"
 import { getCacheTimestamp, clearCache } from "@/lib/swr-cache-provider"
@@ -217,6 +217,7 @@ export function useRepoAnalyzer() {
     data: repoData,
     error: repoError,
     isLoading: isLoadingRepo,
+    mutate: mutateRepo,
   } = useSWR<RepoData>(repoKey, (url) => githubFetcher(url, token), swrConfig)
 
   const defaultBranch = repoData?.default_branch || ""
@@ -237,6 +238,7 @@ export function useRepoAnalyzer() {
     data: treeData,
     error: treeError,
     isLoading: isLoadingTree,
+    mutate: mutateTree,
   } = useSWR<GitHubTreeResponse>(treeKey, (url) => githubFetcher(url, token), {
     ...swrConfig,
     keepPreviousData: true, // Keep showing old tree while fetching new subtree
@@ -329,7 +331,7 @@ export function useRepoAnalyzer() {
     }
   }, [treeKey])
 
-  const analyze = useCallback((repoUrl: string, ref?: string, forceRefresh = false) => {
+  const analyze = useCallback((repoUrl: string, ref?: string) => {
     const parsed = parseRepoInput(repoUrl)
     if (!parsed) {
       return
@@ -338,17 +340,14 @@ export function useRepoAnalyzer() {
     setRepoInfo(parsed)
     setSelectedRef(ref || "")
     setCurrentPath("") // Reset path when analyzing new repo
-
-    if (forceRefresh) {
-      // Invalidate both SWR and localStorage cache
-      clearCache()
-      const baseUrl = `https://api.github.com/repos/${parsed.owner}/${parsed.repoName}`
-      void mutate(baseUrl, undefined, { revalidate: true })
-      void mutate((key) => typeof key === "string" && key.startsWith(baseUrl), undefined, {
-        revalidate: true,
-      })
-    }
   }, [])
+
+  // Refresh current repo data (bypass cache)
+  const refresh = useCallback(() => {
+    clearCache()
+    void mutateRepo(undefined, { revalidate: true })
+    void mutateTree(undefined, { revalidate: true })
+  }, [mutateRepo, mutateTree])
 
   const analyzeWithRef = useCallback(
     (ref: string) => {
@@ -409,6 +408,7 @@ export function useRepoAnalyzer() {
   return {
     analyze,
     analyzeWithRef,
+    refresh,
     reset,
     isAnalyzing,
     isNavigating,

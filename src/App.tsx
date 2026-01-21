@@ -68,6 +68,7 @@ function App() {
     navigateToRoot,
     onBranchSelectorOpen,
     isLoadingRefs,
+    refresh,
   } = useRepoAnalyzer()
 
   const { recent, addRecent, clearRecent } = useRecentRepos()
@@ -174,8 +175,8 @@ function App() {
   const handleRefresh = useCallback(() => {
     if (!result?.repoName) return
     setTreeFilter("")
-    analyze(result.repoName, result.ref, true) // forceRefresh = true
-  }, [analyze, result])
+    refresh()
+  }, [refresh, result?.repoName])
 
   const matchingCount = result ? countMatchingFiles(result.tree, treeFilter) : 0
 
