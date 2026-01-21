@@ -70,6 +70,19 @@ function App() {
 
   const { recent, addRecent, clearRecent } = useRecentRepos()
   const { rateLimit, isLoading: isLoadingRateLimit } = useRateLimit(token)
+
+  // Extract root-level file paths from tree for dependency checking
+  const rootFilePaths = useMemo(() => {
+    if (!result?.tree?.children) return undefined
+    const paths = new Set<string>()
+    for (const child of result.tree.children) {
+      if (child.type === "file") {
+        paths.add(child.name)
+      }
+    }
+    return paths
+  }, [result?.tree?.children])
+
   const {
     dependencies,
     isLoading: isLoadingDeps,
@@ -79,6 +92,7 @@ function App() {
     branch: result?.ref || "",
     token,
     enabled: !!result?.repoName && !!result?.ref,
+    existingPaths: rootFilePaths,
   })
 
   // Add to recent repos when analysis completes

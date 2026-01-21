@@ -47,11 +47,17 @@ async function fetchDependencies(
   repoName: string,
   branch: string,
   token?: string,
+  existingPaths?: Set<string>,
 ): Promise<DependencyInfo[]> {
   const results: DependencyInfo[] = []
 
+  // Filter to only files that exist in the repo (if existingPaths provided)
+  const filesToFetch = existingPaths
+    ? DEPENDENCY_FILES.filter(({ path }) => existingPaths.has(path))
+    : DEPENDENCY_FILES
+
   // Fetch all dependency files in parallel
-  const promises = DEPENDENCY_FILES.map(async ({ path, parser }) => {
+  const promises = filesToFetch.map(async ({ path, parser }) => {
     const content = await fetchFileContent(repoName, branch, path, token)
     if (content) {
       return parser(content)
@@ -75,6 +81,7 @@ interface UseDependenciesOptions {
   branch: string
   token?: string
   enabled?: boolean
+  existingPaths?: Set<string>
 }
 
 export function useDependencies({
@@ -82,10 +89,11 @@ export function useDependencies({
   branch,
   token,
   enabled = true,
+  existingPaths,
 }: UseDependenciesOptions) {
   const { data, error, isLoading, mutate } = useSWR(
     enabled && repoName && branch ? `deps:${repoName}:${branch}` : null,
-    () => fetchDependencies(repoName, branch, token),
+    () => fetchDependencies(repoName, branch, token, existingPaths),
     {
       revalidateOnFocus: false,
       dedupingInterval: 60000,
