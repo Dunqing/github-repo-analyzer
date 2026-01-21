@@ -179,8 +179,8 @@ function calculateStats(tree: FileNode): FileStats {
 function parseRepoInput(input: string): { owner: string; repoName: string } | null {
   const trimmed = input.trim()
 
-  const urlMatch = trimmed.match(/github\.com\/([^/]+)\/([^/]+)/)
-  const shortMatch = trimmed.match(/^([^/]+)\/([^/]+)$/)
+  const urlMatch = trimmed.match(/github\.com\/([^/?#]+)\/([^/?#]+)/)
+  const shortMatch = trimmed.match(/^([^/?#]+)\/([^/?#]+)$/)
 
   if (urlMatch) {
     return {

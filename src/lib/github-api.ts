@@ -66,7 +66,6 @@ export async function githubFetcherSafe<T>(url: string, token?: string): Promise
 export const swrConfig = {
   revalidateOnFocus: false,
   revalidateOnReconnect: false,
-  revalidateOnMount: false, // Use cached data if available
   revalidateIfStale: false, // Don't auto-revalidate stale data
   dedupingInterval: 60 * 60 * 1000, // 1 hour
 }
