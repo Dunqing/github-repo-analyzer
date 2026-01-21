@@ -66,6 +66,8 @@ function App() {
     currentPath,
     navigateToPath,
     navigateToRoot,
+    onBranchSelectorOpen,
+    isLoadingRefs,
   } = useRepoAnalyzer()
 
   const { recent, addRecent, clearRecent } = useRecentRepos()
@@ -410,7 +412,9 @@ function App() {
                       selectedRef={selectedRef}
                       defaultBranch={defaultBranch}
                       onSelect={handleBranchChange}
+                      onOpenChange={onBranchSelectorOpen}
                       disabled={isAnalyzing}
+                      isLoading={isLoadingRefs}
                     />
                   </div>
                   {cacheInfo.isCached && (

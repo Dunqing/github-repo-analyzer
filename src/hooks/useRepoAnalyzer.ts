@@ -202,6 +202,7 @@ export function useRepoAnalyzer() {
   const [repoInfo, setRepoInfo] = useState<{ owner: string; repoName: string } | null>(null)
   const [selectedRef, setSelectedRef] = useState<string>("")
   const [currentPath, setCurrentPath] = useState<string>("")
+  const [shouldFetchRefs, setShouldFetchRefs] = useState(false)
 
   const setToken = useCallback((newToken: string) => {
     setTokenState(newToken)
@@ -241,25 +242,29 @@ export function useRepoAnalyzer() {
     keepPreviousData: true, // Keep showing old tree while fetching new subtree
   })
 
-  // Fetch branches
-  const branchesKey = repoInfo
-    ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/branches?per_page=100`
-    : null
-  const { data: branchesData } = useSWR<GitHubBranch[]>(
+  // Fetch branches (lazy loaded when selector is opened)
+  const branchesKey =
+    repoInfo && shouldFetchRefs
+      ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/branches?per_page=100`
+      : null
+  const { data: branchesData, isLoading: isLoadingBranches } = useSWR<GitHubBranch[]>(
     branchesKey,
     (url) => githubFetcher(url, token),
     swrConfig,
   )
 
-  // Fetch tags
-  const tagsKey = repoInfo
-    ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/tags?per_page=100`
-    : null
-  const { data: tagsData } = useSWR<GitHubTag[]>(
+  // Fetch tags (lazy loaded when selector is opened)
+  const tagsKey =
+    repoInfo && shouldFetchRefs
+      ? `https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repoName}/tags?per_page=100`
+      : null
+  const { data: tagsData, isLoading: isLoadingTags } = useSWR<GitHubTag[]>(
     tagsKey,
     (url) => githubFetcher(url, token),
     swrConfig,
   )
+
+  const isLoadingRefs = isLoadingBranches || isLoadingTags
 
   // Ensure default branch is in branches list
   const branches = useMemo(() => {
@@ -391,6 +396,16 @@ export function useRepoAnalyzer() {
     setCurrentPath("")
   }, [])
 
+  // Trigger fetching branches/tags when selector is opened
+  const onBranchSelectorOpen = useCallback(
+    (open: boolean) => {
+      if (open && !shouldFetchRefs) {
+        setShouldFetchRefs(true)
+      }
+    },
+    [shouldFetchRefs],
+  )
+
   return {
     analyze,
     analyzeWithRef,
@@ -411,5 +426,7 @@ export function useRepoAnalyzer() {
     navigateToPath,
     navigateUp,
     navigateToRoot,
+    onBranchSelectorOpen,
+    isLoadingRefs,
   }
 }
